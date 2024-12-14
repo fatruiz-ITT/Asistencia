@@ -352,6 +352,10 @@
         function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
             const tablaAlumnos = document.getElementById('tabla-alumnos');
             tablaAlumnos.innerHTML = ''; // Limpiar la tabla
+            // Obtener la fecha actual en formato YYYY-MM-DD
+        const today = new Date().toISOString().split('T')[0];
+        // Asignar la fecha al campo de fecha
+        document.getElementById('fechaActual').value = today;
 
             const alumnosFiltrados = data.filter(row => {
                 const empresa = row.c[4]?.v; // Columna E para Empresa
