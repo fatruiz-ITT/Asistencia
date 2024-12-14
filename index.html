@@ -513,23 +513,11 @@
         }
     </script>
     <script>
-    // Get the current date
-    var today = new Date();
-
-    // Format the date as YYYY-MM-DD
-    var yyyy = today.getFullYear();
-    var mm = today.getMonth() + 1; // Months are zero-indexed
-    var dd = today.getDate();
-
-    // Add leading zero for single-digit months and days
-    if (mm < 10) mm = '0' + mm;
-    if (dd < 10) dd = '0' + dd;
-
-    // Combine date components into YYYY-MM-DD format
-    var formattedDate = yyyy + '-' + mm + '-' + dd;
+    // Obtener la fecha actual en formato YYYY-MM-DD
+        const today = new Date().toISOString().split('T')[0];
 
     // Set the value of the input field to today's date
-    document.getElementById("dateInput").value = formattedDate;
+    document.getElementById("dateInput").value = today;
 </script>
 </body>
 </html>
