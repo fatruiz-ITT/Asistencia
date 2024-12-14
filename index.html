@@ -9,7 +9,6 @@
     <style>
         body {
             background-color: #f8f9fa;
-            font-family: 'Arial', sans-serif;
         }
         .header {
             background-color: #007bff;
@@ -26,10 +25,14 @@
             justify-content: center;
             gap: 10px;
             font-size: 18px;
-            border-radius: 8px;
         }
         .icon-large {
             font-size: 24px;
+        }
+        .form-check-input {
+            transform: scale(1.5);
+            margin: auto;
+            display: block;
         }
         .menu-container {
             display: flex;
@@ -41,31 +44,16 @@
             width: 220px;
             height: 70px;
         }
+        /* Tabla responsive */
         .table-responsive {
             max-width: 100%;
             overflow-x: auto;
         }
-        .table th, .table td {
-            text-align: center;
-        }
-        .table-striped tbody tr:nth-of-type(odd) {
-            background-color: #f2f2f2;
-        }
-        .table-dark {
-            background-color: #343a40;
-            color: white;
-        }
-        .form-check-input {
-            transform: scale(1.5);
-            margin: auto;
-            display: block;
-        }
-        input[type="date"] {
-            width: 100px;
-            padding: 5px;
-        }
-        .btn-custom:hover {
-            opacity: 0.9;
+        /* Estilo para el checkbox */
+        input[type="checkbox"] {
+            transform: scale(2.0); /* Hacer el checkbox más grande */
+            margin: center; /* Centrar el checkbox */
+            display: block; /* Asegura que el checkbox se comporte como un bloque para centrarlo */
         }
     </style>
 </head>
@@ -91,6 +79,10 @@
             <button id="btn-borrar" class="btn btn-danger btn-custom menu-item">
                 <i class="fas fa-trash-alt icon-large"></i> Borrar
             </button>
+        </div>
+
+        <div id="form-anexar" class="mt-5" style="display: none;">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-pEVIEG2pKFc57SG7oVDWVjP_qvvz5RSTktbmFjaA6B8MnA/viewform?usp=sf_link" width="100%" height="600px" frameborder="0"></iframe>
         </div>
 
         <div id="form-pasar-lista" class="mt-5" style="display: none;">
@@ -133,18 +125,120 @@
                 </button>
             </div>
         </div>
+
+        <div id="form-visualizar-lista" class="mt-5" style="display: none;">
+            <h2 class="text-center">Visualizar Lista</h2>
+            <div class="mb-3">
+                <label for="materia-visualizar" class="form-label">Selecciona Empresa:</label>
+                <select id="materia" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="grupo-visualizar" class="form-label">Selecciona Grupo-Materia:</label>
+                <select id="grupo" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button id="visualizar" class="btn btn-info mt-3">
+                    <i class="fas fa-eye"></i> Ver Lista
+                </button>
+            </div>
+        </div>
+
+        <div id="form-eliminar-lista" class="mt-5" style="display: none;">
+            <h2 class="text-center">Eliminar Lista</h2>
+            <div class="mb-3">
+                <label for="materia-eliminar" class="form-label">Selecciona Empresa:</label>
+                <select id="materia-eliminar" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="grupo-eliminar" class="form-label">Selecciona Grupo-Materia:</label>
+                <select id="grupo-eliminar" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button id="eliminar-lista" class="btn btn-danger mt-3">
+                    <i class="fas fa-trash"></i> Eliminar Lista
+                </button>
+            </div>
+        </div>
+
+        <div id="form-imprimir-lista" class="mt-5" style="display: none;">
+            <h2 class="text-center">Imprimir Lista</h2>
+            <div class="mb-3">
+                <label for="materia-imprimir" class="form-label">Selecciona Empresa:</label>
+                <select id="materia-imprimir" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="grupo-imprimir" class="form-label">Selecciona Grupo-Materia:</label>
+                <select id="grupo-imprimir" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button id="imprimir-lista" class="btn btn-warning mt-3">
+                    <i class="fas fa-print"></i> Imprimir Lista
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
         document.getElementById('btn-anexar').addEventListener('click', () => {
             document.getElementById('form-anexar').style.display = 'block';
             document.getElementById('form-pasar-lista').style.display = 'none';
+            document.getElementById('form-visualizar-lista').style.display = 'none';
+            document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
         });
 
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
             document.getElementById('form-anexar').style.display = 'none';
             document.getElementById('form-pasar-lista').style.display = 'block';
+            document.getElementById('form-visualizar-lista').style.display = 'none';
+            document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
             cargarEmpresas(); // Cargar empresas y grupos
+        });
+
+        document.getElementById('btn-visualizar').addEventListener('click', () => {
+            document.getElementById('form-anexar').style.display = 'none';
+            document.getElementById('form-pasar-lista').style.display = 'none';
+            document.getElementById('form-visualizar-lista').style.display = 'block';
+            document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
+            cargarEmpresasVisualizar();
+        });
+
+        document.getElementById('btn-borrar').addEventListener('click', () => {
+            document.getElementById('form-anexar').style.display = 'none';
+            document.getElementById('form-pasar-lista').style.display = 'none';
+            document.getElementById('form-visualizar-lista').style.display = 'none';
+            document.getElementById('form-eliminar-lista').style.display = 'block';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
+            cargarEmpresasEliminar();
+        });
+
+        document.getElementById('btn-imprimir').addEventListener('click', () => {
+            document.getElementById('form-anexar').style.display = 'none';
+            document.getElementById('form-pasar-lista').style.display = 'none';
+            document.getElementById('form-visualizar-lista').style.display = 'none';
+            document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'block';
+            cargarEmpresasImprimir();
         });
 
         async function cargarEmpresas() {
@@ -160,10 +254,10 @@
             selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
             
             data.forEach(row => {
-                const empresa = row.c[4]?.v;
+                const empresa = row.c[4]?.v; // Columna E para Empresa
                 if (empresa) {
                     empresas.add(empresa);
-                    const grupo = row.c[3]?.v;
+                    const grupo = row.c[3]?.v; // Columna D para Grupo-Materia
                     if (grupo && !grupos[empresa]) {
                         grupos[empresa] = new Set();
                     }
@@ -207,26 +301,26 @@
 
         function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
             const tablaAlumnos = document.getElementById('tabla-alumnos');
-            tablaAlumnos.innerHTML = '';
+            tablaAlumnos.innerHTML = ''; // Limpiar la tabla
 
             const alumnosFiltrados = data.filter(row => {
-                const empresa = row.c[4]?.v;
-                const grupo = row.c[3]?.v;
+                const empresa = row.c[4]?.v; // Columna E para Empresa
+                const grupo = row.c[3]?.v;  // Columna D para Grupo
                 return empresa === materiaSeleccionada && grupo === grupoSeleccionado;
             });
 
             alumnosFiltrados.forEach(row => {
-                const numeroEmpleado = row.c[1]?.v;
-                const nombreAlumno = row.c[2]?.v;
-                const materia = row.c[3]?.v;
+                const numeroEmpleado = row.c[1]?.v; // Columna B para Número de Empleado
+                const nombreAlumno = row.c[2]?.v; // Columna C para Nombre del Alumno
+                const materia = row.c[3]?.v; // Columna D para Materia
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${numeroEmpleado}</td>
                     <td>${nombreAlumno}</td>
                     <td>${materia}</td>
-                    <td><input type="checkbox" class="form-check-input"></td>
-                    <td><input type="date" class="form-control"></td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="date"></td>
                 `;
                 tablaAlumnos.appendChild(tr);
             });
