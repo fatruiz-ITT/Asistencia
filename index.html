@@ -36,8 +36,8 @@
         }
 		/* Estilo para hacer el checkbox más grande */
 	input[type="checkbox"] {
-  	  transform: scale(2.5); /* Aumenta el tamaño del checkbox */
-   	 margin: auto; /* Centra el checkbox en su celda */
+  	  transform: scale(2.0); /* Aumenta el tamaño del checkbox */
+   	 margin: center; /* Centra el checkbox en su celda */
     	display: block; /* Asegura que el checkbox se muestre como bloque para centrarlo */
 	}
 
@@ -119,21 +119,22 @@
             </div>
         </div>
 
-        <div id="form-visualizar-lista" class="mt-5" style="display: none;">
-            <h2 class="text-center">Visualizar Lista</h2>
+       <div id="form-pasar-lista" class="mt-5" style="display: none;">
+            <h2 class="text-center">Pasar Lista</h2>
             <div class="mb-3">
-                <label for="materia-visualizar" class="form-label">Selecciona Empresa:</label>
+                <label for="materia" class="form-label">Selecciona Empresa:</label>
                 <select id="materia" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="grupo-visualizar" class="form-label">Selecciona Grupo-Materia:</label>
+                <label for="grupo" class="form-label">Selecciona Grupo-Materia:</label>
                 <select id="grupo" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
+
 
             <div class="d-flex justify-content-center">
                 <button id="visualizar" class="btn btn-info mt-3">
