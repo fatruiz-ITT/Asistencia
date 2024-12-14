@@ -317,11 +317,10 @@
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                <td style="display: flex; align-items: center; justify-content: center;">
                     <td>${alumno}</td>
                     <td>${nombre}</td>
                     <td>${materiaSeleccionada}</td>
-                    <td><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
+                    <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
                    <td><input type="date"></td>
                 `;
                 tablaAlumnos.appendChild(tr);
