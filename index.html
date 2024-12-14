@@ -1,5 +1,5 @@
-<!DOCTYPE html> 
-<html lang="en">
+<!DOCTYPE html>
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -77,15 +77,15 @@
         <div id="form-pasar-lista" class="mt-5" style="display: none;">
             <h2 class="text-center">Pasar Lista</h2>
             <div class="mb-3">
-                <label for="empresa" class="form-label">Selecciona Empresa:</label>
-                <select id="empresa" class="form-select">
+                <label for="materia" class="form-label">Selecciona Empresa:</label>
+                <select id="materia" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="grupo-materia" class="form-label">Selecciona Grupo-Materia:</label>
-                <select id="grupo-materia" class="form-select">
+                <label for="grupo" class="form-label">Selecciona Grupo-Materia:</label>
+                <select id="grupo" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
@@ -122,38 +122,37 @@
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
             document.getElementById('form-anexar').style.display = 'none';
             document.getElementById('form-pasar-lista').style.display = 'block';
-            cargarDatos();
+            cargarEmpresas(); // Cargar empresas y grupos
         });
 
-        async function cargarDatos() {
+        async function cargarEmpresas() {
             const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
             const response = await fetch(sheetURL);
             const text = await response.text();
             const json = JSON.parse(text.substring(47).slice(0, -2));
 
             const empresas = new Set();
-            const gruposPorEmpresa = {}; // Almacenará los grupos por empresa
+            const grupos = {};
             const data = json.table.rows;
-            const selectEmpresa = document.getElementById('empresa');
-            const selectGrupoMateria = document.getElementById('grupo-materia');
-
+            const selectEmpresa = document.getElementById('materia');
             selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
-            selectGrupoMateria.innerHTML = '<option value="">Selecciona una opción</option>';
 
-            // Organizar los datos por empresa y grupo
+            // Poblamos el dropdown de Empresas
             data.forEach(row => {
-                const empresa = row.c[4]?.v || "";  // Columna E: Empresa
-                const grupo = row.c[3]?.v || ""; // Columna D: Grupo-Materia
-
-                empresas.add(empresa);
-
-                if (!gruposPorEmpresa[empresa]) {
-                    gruposPorEmpresa[empresa] = new Set();
+                const empresa = row.c[4]?.v; // Columna E para Empresa
+                if (empresa) {
+                    empresas.add(empresa);
+                    // Recolectamos los grupos por empresa
+                    const grupo = row.c[3]?.v; // Columna D para Grupo-Materia
+                    if (grupo && !grupos[empresa]) {
+                        grupos[empresa] = new Set();
+                    }
+                    if (grupo) {
+                        grupos[empresa].add(grupo);
+                    }
                 }
-                gruposPorEmpresa[empresa].add(grupo);
             });
 
-            // Cargar las opciones de empresa
             empresas.forEach(empresa => {
                 const option = document.createElement('option');
                 option.value = empresa;
@@ -161,59 +160,47 @@
                 selectEmpresa.appendChild(option);
             });
 
-            // Actualizar los grupos cuando se seleccione una empresa
+            // Evento para seleccionar empresa
             selectEmpresa.addEventListener('change', () => {
-                const empresaSeleccionada = selectEmpresa.value;
-                actualizarGrupos(empresaSeleccionada, gruposPorEmpresa[empresaSeleccionada]);
+                cargarGrupos(data, selectEmpresa.value, grupos);
             });
         }
 
-        function actualizarGrupos(empresaSeleccionada, grupos) {
-            const selectGrupoMateria = document.getElementById('grupo-materia');
-            selectGrupoMateria.innerHTML = '<option value="">Selecciona una opción</option>';
+        function cargarGrupos(data, empresaSeleccionada, grupos) {
+            const selectGrupo = document.getElementById('grupo');
+            selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
 
-            if (grupos) {
-                grupos.forEach(grupo => {
+            if (empresaSeleccionada && grupos[empresaSeleccionada]) {
+                grupos[empresaSeleccionada].forEach(grupo => {
                     const option = document.createElement('option');
                     option.value = grupo;
                     option.textContent = grupo;
-                    selectGrupoMateria.appendChild(option);
-                });
-
-                // Cargar la tabla cuando se seleccione un grupo
-                selectGrupoMateria.addEventListener('change', () => {
-                    cargarTabla(empresaSeleccionada, selectGrupoMateria.value);
+                    selectGrupo.appendChild(option);
                 });
             }
+
+            selectGrupo.addEventListener('change', () => cargarTabla(data, empresaSeleccionada, selectGrupo.value));
         }
 
-        function cargarTabla(empresaSeleccionada, grupoMateriaSeleccionado) {
-            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
-            fetch(sheetURL)
-                .then(response => response.text())
-                .then(text => {
-                    const json = JSON.parse(text.substring(47).slice(0, -2));
-                    const data = json.table.rows;
-                    const tbody = document.getElementById('tabla-alumnos');
-                    tbody.innerHTML = '';
+        function cargarTabla(data, empresaSeleccionada, grupoSeleccionado) {
+            const tbody = document.getElementById('tabla-alumnos');
+            tbody.innerHTML = '';
 
-                    // Filtrar por empresa y grupo
-                    data.forEach(row => {
-                        if (row.c[4]?.v === empresaSeleccionada && row.c[3]?.v === grupoMateriaSeleccionado) {
-                            const tr = document.createElement('tr');
-
-                            tr.innerHTML = `
-                                <td>${row.c[1]?.v || ""}</td> <!-- Columna B: Número de Empleado -->
-                                <td>${row.c[2]?.v || ""}</td> <!-- Columna C: Nombre del Alumno -->
-                                <td>${row.c[3]?.v || ""}</td> <!-- Columna D: Materia -->
-                                <td><input type="checkbox" class="form-check-input"></td>
-                                <td>${new Date().toLocaleDateString()}</td>
-                            `;
-
-                            tbody.appendChild(tr);
-                        }
-                    });
-                });
+            data.forEach(row => {
+                const empresa = row.c[4]?.v; // Columna E para Empresa
+                const grupo = row.c[3]?.v; // Columna D para Grupo-Materia
+                if (empresa === empresaSeleccionada && grupo === grupoSeleccionado) {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${row.c[2]?.v || ""}</td> <!-- Columna B para Número de Empleado -->
+                        <td>${row.c[1]?.v || ""}</td> <!-- Columna C para Nombre del Alumno -->
+                        <td>${grupo || ""}</td> <!-- Grupo -->
+                        <td><input type="checkbox" class="form-check-input"></td>
+                        <td>${new Date().toLocaleDateString()}</td> <!-- Fecha -->
+                    `;
+                    tbody.appendChild(tr);
+                }
+            });
         }
     </script>
 
