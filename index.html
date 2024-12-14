@@ -159,6 +159,9 @@
                   'Content-Type': 'application/json'
                 }
               });
+              // Comprobar la respuesta en consola
+            const result = await response.json();
+            console.log(response);
 
               // Comprobar si la respuesta es exitosa
               if (response.ok) {
