@@ -310,9 +310,9 @@
             });
 
             alumnosFiltrados.forEach(row => {
-                const alumno = row.c[0]?.v;
-                const nombre = row.c[1]?.v;
-                const asistio = row.c[2]?.v;
+                const alumno = row.c[1]?.v;
+                const nombre = row.c[2]?.v;
+                const asistio = row.c[3]?.v;
                 const fechaAsistencia = row.c[5]?.v;
 
                 const tr = document.createElement('tr');
