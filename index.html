@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!DOCTYPE html> 
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -28,6 +28,11 @@
         .icon-large {
             font-size: 24px;
         }
+        .form-check-input {
+            transform: scale(1.5);
+            margin: auto;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -48,39 +53,6 @@
             </button>
         </div>
 
-        <!-- Sección para borrar -->
-        <div id="form-borrar" class="mt-5" style="display: none;">
-            <h2 class="text-center">Borrar Alumno o Grupo</h2>
-
-            <div class="mb-3">
-                <label for="alumno" class="form-label">Selecciona Alumno a Borrar:</label>
-                <input id="alumno" class="form-control" list="alumnos-list" placeholder="Escribe para buscar...">
-                <datalist id="alumnos-list">
-                    <!-- Los alumnos serán cargados dinámicamente aquí -->
-                </datalist>
-            </div>
-
-            <div class="mb-3">
-                <label for="grupo" class="form-label">Selecciona Grupo a Borrar:</label>
-                <select id="grupo" class="form-select">
-                    <!-- Los grupos serán cargados dinámicamente aquí -->
-                </select>
-            </div>
-
-            <div class="d-flex justify-content-center mt-3">
-                <button id="btn-borrar-alumno" class="btn btn-danger">
-                    <i class="fas fa-trash-alt"></i> Borrar Alumno
-                </button>
-                <button id="btn-borrar-grupo" class="btn btn-danger ms-3">
-                    <i class="fas fa-trash-alt"></i> Borrar Grupo
-                </button>
-            </div>
-        </div>
-
-        <div id="form-anexar" class="mt-5" style="display: none;">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-pEVIEG2pKFc57SG7oVDWVjP_qvvz5RSTktbmFjaA6B8MnA/viewform?usp=sf_link" width="100%" height="600px" frameborder="0"></iframe>
-        </div>
-
         <div id="form-pasar-lista" class="mt-5" style="display: none;">
             <h2 class="text-center">Pasar Lista</h2>
 
@@ -91,9 +63,18 @@
                 </select>
             </div>
 
-            <div id="info-materia" class="mb-3">
-                <p><strong>Salón-Grupo:</strong> <span id="salon"></span></p>
-                <p><strong>Horario:</strong> <span id="horario"></span></p>
+            <div class="mb-3">
+                <label for="grupo" class="form-label">Salón-Grupo:</label>
+                <select id="grupo" class="form-select">
+                    <!-- Opciones cargadas dinámicamente -->
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="horario" class="form-label">Horario:</label>
+                <select id="horario" class="form-select">
+                    <!-- Opciones cargadas dinámicamente -->
+                </select>
             </div>
 
             <table class="table table-bordered table-striped table-responsive">
@@ -120,81 +101,11 @@
     </div>
 
     <script>
-        // Mostrar y ocultar secciones
-        document.getElementById('btn-anexar').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'block';
-            document.getElementById('form-pasar-lista').style.display = 'none';
-            document.getElementById('form-borrar').style.display = 'none';
-        });
-
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'none';
             document.getElementById('form-pasar-lista').style.display = 'block';
-            document.getElementById('form-borrar').style.display = 'none';
             cargarMaterias();
         });
 
-        document.getElementById('btn-borrar').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'none';
-            document.getElementById('form-pasar-lista').style.display = 'none';
-            document.getElementById('form-borrar').style.display = 'block';
-            cargarAlumnosYGrupos();
-        });
-
-        // Función para cargar alumnos y grupos del Google Sheet
-        async function cargarAlumnosYGrupos() {
-            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
-            const response = await fetch(sheetURL);
-            const text = await response.text();
-            const json = JSON.parse(text.substring(47).slice(0, -2));
-
-            const alumnos = new Set();
-            const grupos = new Set();
-            const data = json.table.rows;
-
-            const datalistAlumnos = document.getElementById('alumnos-list');
-            const selectGrupos = document.getElementById('grupo');
-
-            datalistAlumnos.innerHTML = '';
-            selectGrupos.innerHTML = '';
-
-            // Recopilar alumnos y grupos únicos
-            data.forEach(row => {
-                const alumno = row.c[1]?.v || "";
-                const grupo = row.c[4]?.v || "";
-                if (alumno) alumnos.add(alumno);
-                if (grupo) grupos.add(grupo);
-            });
-
-            // Cargar opciones de alumnos
-            alumnos.forEach(alumno => {
-                const option = document.createElement('option');
-                option.value = alumno;
-                datalistAlumnos.appendChild(option);
-            });
-
-            // Cargar opciones de grupos
-            grupos.forEach(grupo => {
-                const option = document.createElement('option');
-                option.value = grupo;
-                selectGrupos.appendChild(option);
-            });
-        }
-
-        // Función para manejar la acción de borrar
-        document.getElementById('btn-borrar-alumno').addEventListener('click', () => {
-            const alumnoSeleccionado = document.getElementById('alumno').value;
-            alert(`Alumno "${alumnoSeleccionado}" borrado`);
-            // Aquí agregarías el código para borrar al alumno desde la base de datos o el Google Sheet
-        });
-
-        document.getElementById('btn-borrar-grupo').addEventListener('click', () => {
-            const grupoSeleccionado = document.getElementById('grupo').value;
-            alert(`Grupo "${grupoSeleccionado}" borrado`);
-            // Aquí agregarías el código para borrar el grupo desde la base de datos o el Google Sheet
-        });
-
-        // Función para cargar materias del Google Sheet
         async function cargarMaterias() {
             const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
             const response = await fetch(sheetURL);
@@ -217,16 +128,48 @@
                 selectMateria.appendChild(option);
             });
 
-            selectMateria.addEventListener('change', () => cargarTabla(data, selectMateria.value));
+            selectMateria.addEventListener('change', () => cargarGruposYHorarios(data, selectMateria.value));
         }
 
-        // Función para cargar la tabla de alumnos
-        function cargarTabla(data, materiaSeleccionada) {
+        function cargarGruposYHorarios(data, materiaSeleccionada) {
+            const selectGrupo = document.getElementById('grupo');
+            const selectHorario = document.getElementById('horario');
+            selectGrupo.innerHTML = '';
+            selectHorario.innerHTML = '';
+
+            const grupos = new Set();
+            const horarios = new Set();
+
+            data.forEach(row => {
+                if (row.c[3]?.v === materiaSeleccionada) {
+                    grupos.add(row.c[4]?.v || "");
+                    horarios.add(row.c[5]?.v || "");
+                }
+            });
+
+            grupos.forEach(grupo => {
+                const option = document.createElement('option');
+                option.value = grupo;
+                option.textContent = grupo;
+                selectGrupo.appendChild(option);
+            });
+
+            horarios.forEach(horario => {
+                const option = document.createElement('option');
+                option.value = horario;
+                option.textContent = horario;
+                selectHorario.appendChild(option);
+            });
+
+            selectGrupo.addEventListener('change', () => cargarTabla(data, materiaSeleccionada, selectGrupo.value));
+        }
+
+        function cargarTabla(data, materiaSeleccionada, grupoSeleccionado) {
             const tbody = document.getElementById('tabla-alumnos');
             tbody.innerHTML = '';
 
             data.forEach(row => {
-                if (row.c[3]?.v === materiaSeleccionada) {
+                if (row.c[3]?.v === materiaSeleccionada && row.c[4]?.v === grupoSeleccionado) {
                     const tr = document.createElement('tr');
 
                     tr.innerHTML = `
