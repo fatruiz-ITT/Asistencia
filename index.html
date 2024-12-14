@@ -49,12 +49,19 @@
             max-width: 100%;
             overflow-x: auto;
         }
-        /* Estilo para el checkbox */
-        input[type="checkbox"] {
-            transform: scale(2.0); /* Hacer el checkbox más grande */
-            margin: center; /* Centrar el checkbox */
-            display: block; /* Asegura que el checkbox se comporte como un bloque para centrarlo */
-        }
+        /* Contenedor principal */
+       .container {
+           display: flex; /* Activa flexbox */
+           justify-content: center; /* Centra horizontalmente */
+           align-items: center; /* Centra verticalmente */
+           height: 100vh; /* Altura completa de la ventana */
+           margin: 0;
+       }
+
+       /* Estilo del checkbox */
+       input[type="checkbox"] {
+           transform: scale(2.0); /* Ajusta el tamaño del checkbox */
+       }
     </style>
 </head>
 <body>
@@ -95,7 +102,7 @@
             </div>
 
             <div class="mb-3">
-                <label for="grupo" class="form-label">Selecciona Grupo-Materia:</label>
+                <label for="grupo" class="form-label">Selecciona Grupo/Materia:</label>
                 <select id="grupo" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
@@ -130,14 +137,14 @@
             <h2 class="text-center">Visualizar Lista</h2>
             <div class="mb-3">
                 <label for="materia-visualizar" class="form-label">Selecciona Empresa:</label>
-                <select id="materia" class="form-select">
+                <select id="materia-visualizar" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="grupo-visualizar" class="form-label">Selecciona Grupo-Materia:</label>
-                <select id="grupo" class="form-select">
+                <select id="grupo-visualizar" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
@@ -252,7 +259,7 @@
             const data = json.table.rows;
             const selectEmpresa = document.getElementById('materia');
             selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
-            
+
             data.forEach(row => {
                 const empresa = row.c[4]?.v; // Columna E para Empresa
                 if (empresa) {
@@ -288,7 +295,7 @@
         function cargarGrupos(data, empresaSeleccionada, grupos, selectId) {
             const selectGrupo = document.getElementById(selectId);
             selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
-            
+
             if (empresaSeleccionada && grupos[empresaSeleccionada]) {
                 grupos[empresaSeleccionada].forEach(grupo => {
                     const option = document.createElement('option');
