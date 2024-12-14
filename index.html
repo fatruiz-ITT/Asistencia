@@ -101,6 +101,13 @@
     </div>
 
     <script>
+        // Mostrar y ocultar secciones
+        document.getElementById('btn-anexar').addEventListener('click', () => {
+            document.getElementById('form-anexar').style.display = 'block';
+            document.getElementById('form-pasar-lista').style.display = 'none';
+            document.getElementById('form-borrar').style.display = 'none';
+        });
+
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
             document.getElementById('form-pasar-lista').style.display = 'block';
             cargarMaterias();
