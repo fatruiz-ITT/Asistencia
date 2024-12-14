@@ -242,6 +242,21 @@
             </div>
         </div>
     </div>
+    <script>
+    function setFechaHoy() {
+           var hoy = new Date();
+           var dia = hoy.getDate();
+           var mes = hoy.getMonth() + 1; // Los meses son 0-indexados
+           var anio = hoy.getFullYear();
+
+           // Asegurarse de que el día y el mes tengan dos dígitos
+           if(dia < 10) dia = '0' + dia;
+           if(mes < 10) mes = '0' + mes;
+
+           var fechaHoy = anio + '-' + mes + '-' + dia;
+           document.getElementById('fechaHoy').value = fechaHoy;
+       }
+</script>
 
     <script>
         // Funciones de manejo de eventos
@@ -371,7 +386,7 @@
                     <td>${alumno}</td>
                     <td>${nombre}</td>
                     <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
-                    <td><input type="date" id="dateInput"></td>
+                    <td><input type="date" id="fechaHoy"></td>
                 `;
                 tablaAlumnos.appendChild(tr);
             });
@@ -512,12 +527,5 @@
             });
         }
     </script>
-    <script>
-    // Obtener la fecha actual en formato YYYY-MM-DD
-        const today = new Date().toISOString().split('T')[0];
-
-    // Set the value of the input field to today's date
-    document.getElementById("dateInput").value = today;
-</script>
 </body>
 </html>
