@@ -296,9 +296,9 @@
             });
 
             alumnosFiltrados.forEach(row => {
-                const numeroEmpleado = row.c[0]?.v; // Columna A para Número de Empleado
-                const nombreAlumno = row.c[1]?.v; // Columna B para Nombre del Alumno
-                const materia = row.c[4]?.v; // Columna E para Materia
+                const numeroEmpleado = row.c[1]?.v; // Columna A para Número de Empleado
+                const nombreAlumno = row.c[2]?.v; // Columna B para Nombre del Alumno
+                const materia = row.c[3]?.v; // Columna E para Materia
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
