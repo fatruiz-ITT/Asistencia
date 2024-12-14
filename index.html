@@ -53,27 +53,31 @@
             </button>
         </div>
 
+        <div id="form-anexar" class="mt-5" style="display: none;">
+            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-pEVIEG2pKFc57SG7oVDWVjP_qvvz5RSTktbmFjaA6B8MnA/viewform?usp=sf_link" width="100%" height="600px" frameborder="0"></iframe>
+        </div>
+
         <div id="form-pasar-lista" class="mt-5" style="display: none;">
             <h2 class="text-center">Pasar Lista</h2>
 
             <div class="mb-3">
                 <label for="materia" class="form-label">Selecciona Materia:</label>
                 <select id="materia" class="form-select">
-                    <!-- Opciones cargadas dinámicamente -->
+                    <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="grupo" class="form-label">Salón-Grupo:</label>
                 <select id="grupo" class="form-select">
-                    <!-- Opciones cargadas dinámicamente -->
+                    <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="horario" class="form-label">Horario:</label>
                 <select id="horario" class="form-select">
-                    <!-- Opciones cargadas dinámicamente -->
+                    <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
@@ -101,14 +105,13 @@
     </div>
 
     <script>
-        // Mostrar y ocultar secciones
         document.getElementById('btn-anexar').addEventListener('click', () => {
             document.getElementById('form-anexar').style.display = 'block';
             document.getElementById('form-pasar-lista').style.display = 'none';
-            document.getElementById('form-borrar').style.display = 'none';
         });
 
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
+            document.getElementById('form-anexar').style.display = 'none';
             document.getElementById('form-pasar-lista').style.display = 'block';
             cargarMaterias();
         });
@@ -122,7 +125,7 @@
             const materias = new Set();
             const data = json.table.rows;
             const selectMateria = document.getElementById('materia');
-            selectMateria.innerHTML = '';
+            selectMateria.innerHTML = '<option value="">Selecciona una opción</option>';
 
             data.forEach(row => {
                 materias.add(row.c[3]?.v || "");
@@ -141,8 +144,8 @@
         function cargarGruposYHorarios(data, materiaSeleccionada) {
             const selectGrupo = document.getElementById('grupo');
             const selectHorario = document.getElementById('horario');
-            selectGrupo.innerHTML = '';
-            selectHorario.innerHTML = '';
+            selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
+            selectHorario.innerHTML = '<option value="">Selecciona una opción</option>';
 
             const grupos = new Set();
             const horarios = new Set();
