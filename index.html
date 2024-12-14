@@ -157,6 +157,29 @@
                 </button>
             </div>
         </div>
+
+        <div id="form-imprimir-lista" class="mt-5" style="display: none;">
+            <h2 class="text-center">Imprimir Lista</h2>
+            <div class="mb-3">
+                <label for="materia-imprimir" class="form-label">Selecciona Empresa:</label>
+                <select id="materia-imprimir" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="mb-3">
+                <label for="grupo-imprimir" class="form-label">Selecciona Grupo-Materia:</label>
+                <select id="grupo-imprimir" class="form-select">
+                    <option value="">Selecciona una opción</option>
+                </select>
+            </div>
+
+            <div class="d-flex justify-content-center">
+                <button id="imprimir-lista" class="btn btn-warning mt-3">
+                    <i class="fas fa-print"></i> Imprimir Lista
+                </button>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -165,6 +188,7 @@
             document.getElementById('form-pasar-lista').style.display = 'none';
             document.getElementById('form-visualizar-lista').style.display = 'none';
             document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
         });
 
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
@@ -172,6 +196,7 @@
             document.getElementById('form-pasar-lista').style.display = 'block';
             document.getElementById('form-visualizar-lista').style.display = 'none';
             document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
             cargarEmpresas(); // Cargar empresas y grupos
         });
 
@@ -180,6 +205,7 @@
             document.getElementById('form-pasar-lista').style.display = 'none';
             document.getElementById('form-visualizar-lista').style.display = 'block';
             document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
             cargarEmpresasVisualizar();
         });
 
@@ -188,7 +214,17 @@
             document.getElementById('form-pasar-lista').style.display = 'none';
             document.getElementById('form-visualizar-lista').style.display = 'none';
             document.getElementById('form-eliminar-lista').style.display = 'block';
+            document.getElementById('form-imprimir-lista').style.display = 'none';
             cargarEmpresasEliminar();
+        });
+
+        document.getElementById('btn-imprimir').addEventListener('click', () => {
+            document.getElementById('form-anexar').style.display = 'none';
+            document.getElementById('form-pasar-lista').style.display = 'none';
+            document.getElementById('form-visualizar-lista').style.display = 'none';
+            document.getElementById('form-eliminar-lista').style.display = 'none';
+            document.getElementById('form-imprimir-lista').style.display = 'block';
+            cargarEmpresasImprimir();
         });
 
         async function cargarEmpresas() {
@@ -208,6 +244,9 @@
 
             const selectEmpresaEliminar = document.getElementById('materia-eliminar');
             selectEmpresaEliminar.innerHTML = '<option value="">Selecciona una opción</option>';
+
+            const selectEmpresaImprimir = document.getElementById('materia-imprimir');
+            selectEmpresaImprimir.innerHTML = '<option value="">Selecciona una opción</option>';
 
             data.forEach(row => {
                 const empresa = row.c[4]?.v; // Columna E para Empresa
@@ -230,6 +269,7 @@
                 selectEmpresa.appendChild(option);
                 selectEmpresaVisualizar.appendChild(option.cloneNode(true));
                 selectEmpresaEliminar.appendChild(option.cloneNode(true));
+                selectEmpresaImprimir.appendChild(option.cloneNode(true));
             });
 
             // Evento para seleccionar empresa
@@ -243,6 +283,10 @@
 
             selectEmpresaEliminar.addEventListener('change', () => {
                 cargarGrupos(data, selectEmpresaEliminar.value, grupos, 'grupo-eliminar');
+            });
+
+            selectEmpresaImprimir.addEventListener('change', () => {
+                cargarGrupos(data, selectEmpresaImprimir.value, grupos, 'grupo-imprimir');
             });
         }
 
@@ -259,18 +303,6 @@
                 });
             }
         }
-
-        document.getElementById('eliminar-lista').addEventListener('click', () => {
-            const empresaSeleccionada = document.getElementById('materia-eliminar').value;
-            const grupoSeleccionado = document.getElementById('grupo-eliminar').value;
-            
-            if (empresaSeleccionada && grupoSeleccionado) {
-                alert(`Lista de la empresa "${empresaSeleccionada}" y grupo "${grupoSeleccionado}" eliminada.`);
-                // Lógica para eliminar la lista o limpiar la tabla aquí
-            } else {
-                alert("Por favor, selecciona la empresa y el grupo.");
-            }
-        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
