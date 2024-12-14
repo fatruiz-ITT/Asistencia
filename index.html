@@ -121,44 +121,57 @@
             </div>
         </div>
 
- <!-- Incluir el código JavaScript -->
- <script>
-   // El código que has mencionado debe ir aquí
-   document.getElementById('guardar-lista').addEventListener('click', async function() {
-     const alumnos = [];
-     const filas = document.querySelectorAll('#tabla-alumnos tr');
+        <script>
+          document.getElementById('guardar-lista').addEventListener('click', async function() {
+            const alumnos = [];
+            const filas = document.querySelectorAll('#tabla-alumnos tr');
 
-     filas.forEach(function(fila) {
-       const celdas = fila.querySelectorAll('td');
-       const numeroEmpleado = celdas[0].textContent;
-       const nombreAlumno = celdas[1].textContent;
-       const asistio = celdas[2].querySelector('input').checked ? 'Sí' : 'No';
-       const fechaAsistencia = celdas[3].querySelector('input').value;
+            filas.forEach(function(fila) {
+              const celdas = fila.querySelectorAll('td');
+              const numeroEmpleado = celdas[0].textContent.trim();
+              const nombreAlumno = celdas[1].textContent.trim();
+              const asistio = celdas[2].querySelector('input').checked ? 'Sí' : 'No';
+              const fechaAsistencia = celdas[3].querySelector('input').value.trim();
 
-       alumnos.push({
-         numeroEmpleado: numeroEmpleado,
-         nombreAlumno: nombreAlumno,
-         asistio: asistio,
-         fechaAsistencia: fechaAsistencia
-       });
-     });
+              // Verificar que los campos no estén vacíos
+              if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
+                alumnos.push({
+                  numeroEmpleado: numeroEmpleado,
+                  nombreAlumno: nombreAlumno,
+                  asistio: asistio,
+                  fechaAsistencia: fechaAsistencia
+                });
+              }
+            });
 
-     // Enviar los datos al Google Apps Script
-  const response = await fetch('https://script.google.com/macros/s/AKfycbzgw5L2FvdYcBkALD9wOelQQS4__Zh2gdXphDl-pg_oKp7hbaveSTQGTBxKnq1YywNugQ/exec', {
-    method: 'POST',
-    body: JSON.stringify(alumnos),
-    headers: {
-      'Content-Type': 'application/json'
-    }
-  });
+            // Verificar si hay alumnos para enviar
+            if (alumnos.length === 0) {
+              alert('No hay datos para guardar');
+              return;
+            }
 
-     if (response.ok) {
-       alert('Datos guardados correctamente en Google Sheets');
-     } else {
-       alert('Hubo un error al guardar los datos');
-     }
-   });
- </script>
+            try {
+              // Enviar los datos al Google Apps Script
+              const response = await fetch('https://script.google.com/macros/s/AKfycbzgw5L2FvdYcBkALD9wOelQQS4__Zh2gdXphDl-pg_oKp7hbaveSTQGTBxKnq1YywNugQ/exec', {
+                method: 'POST',
+                body: JSON.stringify(alumnos),
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              });
+
+              // Comprobar si la respuesta es exitosa
+              if (response.ok) {
+                alert('Datos guardados correctamente en Google Sheets');
+              } else {
+                alert('Hubo un error al guardar los datos: ' + response.statusText);
+              }
+            } catch (error) {
+              alert('Error de red: ' + error.message);
+            }
+          });
+        </script>
+
 
         <div id="form-visualizar-lista" class="mt-5" style="display: none;">
             <h2 class="text-center">Visualizar Lista</h2>
