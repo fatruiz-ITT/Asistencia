@@ -44,7 +44,6 @@
             width: 220px;
             height: 70px;
         }
-        /* Tabla responsive */
         .table-responsive {
             max-width: 100%;
             overflow-x: auto;
@@ -52,7 +51,7 @@
 
        /* Estilo del checkbox */
        input[type="checkbox"] {
-           transform: scale(2.0); /* Ajusta el tamaño del checkbox */
+           transform: scale(2.0);
        }
     </style>
 </head>
@@ -80,6 +79,7 @@
             </button>
         </div>
 
+        <!-- Formularios de cada sección -->
         <div id="form-anexar" class="mt-5" style="display: none;">
             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-pEVIEG2pKFc57SG7oVDWVjP_qvvz5RSTktbmFjaA6B8MnA/viewform?usp=sf_link" width="100%" height="600px" frameborder="0"></iframe>
         </div>
@@ -100,7 +100,6 @@
                 </select>
             </div>
 
-            <!-- Tabla responsiva -->
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
                     <thead class="table-dark">
@@ -112,9 +111,7 @@
                             <th>Fecha de Asistencia</th>
                         </tr>
                     </thead>
-                    <tbody id="tabla-alumnos">
-                        <!-- Filas cargadas dinámicamente -->
-                    </tbody>
+                    <tbody id="tabla-alumnos"></tbody>
                 </table>
             </div>
 
@@ -152,14 +149,14 @@
             <h2 class="text-center">Eliminar Lista</h2>
             <div class="mb-3">
                 <label for="materia-eliminar" class="form-label">Selecciona Empresa:</label>
-                <select id="materia" class="form-select">
+                <select id="materia-eliminar" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="grupo-eliminar" class="form-label">Selecciona Grupo-Materia:</label>
-                <select id="grupo" class="form-select">
+                <select id="grupo-eliminar" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
@@ -175,14 +172,14 @@
             <h2 class="text-center">Imprimir Lista</h2>
             <div class="mb-3">
                 <label for="materia-imprimir" class="form-label">Selecciona Empresa:</label>
-                <select id="materia" class="form-select">
+                <select id="materia-imprimir" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="grupo-imprimir" class="form-label">Selecciona Grupo-Materia:</label>
-                <select id="grupo" class="form-select">
+                <select id="grupo-imprimir" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
@@ -196,6 +193,7 @@
     </div>
 
     <script>
+        // Funciones de manejo de eventos
         document.getElementById('btn-anexar').addEventListener('click', () => {
             document.getElementById('form-anexar').style.display = 'block';
             document.getElementById('form-pasar-lista').style.display = 'none';
@@ -240,6 +238,7 @@
             cargarEmpresasImprimir();
         });
 
+        // Funciones de carga de datos desde Google Sheets
         async function cargarEmpresas() {
             const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
             const response = await fetch(sheetURL);
@@ -284,6 +283,7 @@
             });
         }
 
+        // Función para cargar los grupos según la materia seleccionada
         function cargarGrupos(data, empresaSeleccionada, grupos, selectId) {
             const selectGrupo = document.getElementById(selectId);
             selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
@@ -298,6 +298,7 @@
             }
         }
 
+        // Función para cargar los alumnos
         function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
             const tablaAlumnos = document.getElementById('tabla-alumnos');
             tablaAlumnos.innerHTML = ''; // Limpiar la tabla
@@ -309,83 +310,157 @@
             });
 
             alumnosFiltrados.forEach(row => {
-                const numeroEmpleado = row.c[1]?.v; // Columna B para Número de Empleado
-                const nombreAlumno = row.c[2]?.v; // Columna C para Nombre del Alumno
-                const materia = row.c[3]?.v; // Columna D para Materia
+                const alumno = row.c[0]?.v;
+                const nombre = row.c[1]?.v;
+                const asistio = row.c[2]?.v;
+                const fechaAsistencia = row.c[5]?.v;
 
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
-                    <td>${numeroEmpleado}</td>
-                    <td>${nombreAlumno}</td>
-                    <td>${materia}</td>
-                    <td><input type="checkbox"></td>
-                    <td><input type="date"></td>
+                    <td>${alumno}</td>
+                    <td>${nombre}</td>
+                    <td>${materiaSeleccionada}</td>
+                    <td><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
+                    <td>${fechaAsistencia || ''}</td>
                 `;
                 tablaAlumnos.appendChild(tr);
             });
         }
-    </script>
 
-<script>
-    async function cargarVizualizar() {
-        const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
-        const response = await fetch(sheetURL);
-        const text = await response.text();
-        const json = JSON.parse(text.substring(47).slice(0, -2));
+        // Funciones de carga para los formularios de Visualizar, Eliminar e Imprimir
+        async function cargarEmpresasVisualizar() {
+            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
+            const response = await fetch(sheetURL);
+            const text = await response.text();
+            const json = JSON.parse(text.substring(47).slice(0, -2));
 
-        const empresas = new Set();
-        const grupos = {};
-        const data = json.table.rows;
-        const selectEmpresa = document.getElementById('materia-visualizar');
-        selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
+            const empresas = new Set();
+            const grupos = {};
+            const data = json.table.rows;
+            const selectEmpresa = document.getElementById('materia-visualizar');
+            selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
 
-        data.forEach(row => {
-            const empresa = row.c[4]?.v; // Columna E para Empresa
-            if (empresa) {
-                empresas.add(empresa);
-                const grupo = row.c[3]?.v; // Columna D para Grupo-Materia
-                if (grupo && !grupos[empresa]) {
-                    grupos[empresa] = new Set();
+            data.forEach(row => {
+                const empresa = row.c[4]?.v; // Columna E para Empresa
+                if (empresa) {
+                    empresas.add(empresa);
+                    const grupo = row.c[3]?.v; // Columna D para Grupo
+                    if (grupo && !grupos[empresa]) {
+                        grupos[empresa] = new Set();
+                    }
+                    if (grupo) {
+                        grupos[empresa].add(grupo);
+                    }
                 }
-                if (grupo) {
-                    grupos[empresa].add(grupo);
-                }
-            }
-        });
+            });
 
-        empresas.forEach(empresa => {
-            const option = document.createElement('option');
-            option.value = empresa;
-            option.textContent = empresa;
-            selectEmpresa.appendChild(option);
-        });
-
-        selectEmpresa.addEventListener('change', () => {
-            cargarGrupos(data, selectEmpresa.value, grupos, 'grupo');
-        });
-
-        document.getElementById('grupo-visualizar').addEventListener('change', () => {
-            const materiaSeleccionada = selectEmpresa.value;
-            const grupoSeleccionado = document.getElementById('grupo-visualizar').value;
-            cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
-        });
-    }
-
-    function cargarGrupos(data, empresaSeleccionada, grupos, selectId) {
-        const selectGrupo = document.getElementById(selectId);
-        selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
-
-        if (empresaSeleccionada && grupos[empresaSeleccionada]) {
-            grupos[empresaSeleccionada].forEach(grupo => {
+            empresas.forEach(empresa => {
                 const option = document.createElement('option');
-                option.value = grupo;
-                option.textContent = grupo;
-                selectGrupo.appendChild(option);
+                option.value = empresa;
+                option.textContent = empresa;
+                selectEmpresa.appendChild(option);
+            });
+
+            selectEmpresa.addEventListener('change', () => {
+                cargarGrupos(data, selectEmpresa.value, grupos, 'grupo-visualizar');
+            });
+
+            document.getElementById('grupo-visualizar').addEventListener('change', () => {
+                const materiaSeleccionada = selectEmpresa.value;
+                const grupoSeleccionado = document.getElementById('grupo-visualizar').value;
+                cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
             });
         }
-    }
-    </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
+        // Función para cargar empresas en el formulario de eliminación
+        async function cargarEmpresasEliminar() {
+            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
+            const response = await fetch(sheetURL);
+            const text = await response.text();
+            const json = JSON.parse(text.substring(47).slice(0, -2));
+
+            const empresas = new Set();
+            const grupos = {};
+            const data = json.table.rows;
+            const selectEmpresa = document.getElementById('materia-eliminar');
+            selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
+
+            data.forEach(row => {
+                const empresa = row.c[4]?.v; // Columna E para Empresa
+                if (empresa) {
+                    empresas.add(empresa);
+                    const grupo = row.c[3]?.v; // Columna D para Grupo
+                    if (grupo && !grupos[empresa]) {
+                        grupos[empresa] = new Set();
+                    }
+                    if (grupo) {
+                        grupos[empresa].add(grupo);
+                    }
+                }
+            });
+
+            empresas.forEach(empresa => {
+                const option = document.createElement('option');
+                option.value = empresa;
+                option.textContent = empresa;
+                selectEmpresa.appendChild(option);
+            });
+
+            selectEmpresa.addEventListener('change', () => {
+                cargarGrupos(data, selectEmpresa.value, grupos, 'grupo-eliminar');
+            });
+
+            document.getElementById('grupo-eliminar').addEventListener('change', () => {
+                const materiaSeleccionada = selectEmpresa.value;
+                const grupoSeleccionado = document.getElementById('grupo-eliminar').value;
+                cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
+            });
+        }
+
+        // Función para cargar empresas en el formulario de impresión
+        async function cargarEmpresasImprimir() {
+            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
+            const response = await fetch(sheetURL);
+            const text = await response.text();
+            const json = JSON.parse(text.substring(47).slice(0, -2));
+
+            const empresas = new Set();
+            const grupos = {};
+            const data = json.table.rows;
+            const selectEmpresa = document.getElementById('materia-imprimir');
+            selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
+
+            data.forEach(row => {
+                const empresa = row.c[4]?.v; // Columna E para Empresa
+                if (empresa) {
+                    empresas.add(empresa);
+                    const grupo = row.c[3]?.v; // Columna D para Grupo
+                    if (grupo && !grupos[empresa]) {
+                        grupos[empresa] = new Set();
+                    }
+                    if (grupo) {
+                        grupos[empresa].add(grupo);
+                    }
+                }
+            });
+
+            empresas.forEach(empresa => {
+                const option = document.createElement('option');
+                option.value = empresa;
+                option.textContent = empresa;
+                selectEmpresa.appendChild(option);
+            });
+
+            selectEmpresa.addEventListener('change', () => {
+                cargarGrupos(data, selectEmpresa.value, grupos, 'grupo-imprimir');
+            });
+
+            document.getElementById('grupo-imprimir').addEventListener('change', () => {
+                const materiaSeleccionada = selectEmpresa.value;
+                const grupoSeleccionado = document.getElementById('grupo-imprimir').value;
+                cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
+            });
+        }
+    </script>
 </body>
 </html>
