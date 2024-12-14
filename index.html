@@ -131,7 +131,7 @@
               const numeroEmpleado = celdas[0].textContent.trim();
               const nombreAlumno = celdas[1].textContent.trim();
               const asistio = celdas[2].querySelector('input').checked ? 'Sí' : 'No';
-              const fechaAsistencia = celdas[3].querySelector('input').value.trim();
+              const fechaAsistencia = celdas[3].textContent.trim();
 
               // Verificar que los campos no estén vacíos
               if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
