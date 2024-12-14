@@ -34,13 +34,6 @@
             margin: auto;
             display: block;
         }
-		/* Estilo para hacer el checkbox más grande */
-	input[type="checkbox"] {
-  	  transform: scale(2.0); /* Aumenta el tamaño del checkbox */
-   	 margin: center; /* Centra el checkbox en su celda */
-    	display: block; /* Asegura que el checkbox se muestre como bloque para centrarlo */
-	}
-
         .menu-container {
             display: flex;
             flex-wrap: wrap;
@@ -50,6 +43,17 @@
         .menu-item {
             width: 220px;
             height: 70px;
+        }
+        /* Tabla responsive */
+        .table-responsive {
+            max-width: 100%;
+            overflow-x: auto;
+        }
+        /* Estilo para el checkbox */
+        input[type="checkbox"] {
+            transform: scale(2.0); /* Hacer el checkbox más grande */
+            margin: center; /* Centrar el checkbox */
+            display: block; /* Asegura que el checkbox se comporte como un bloque para centrarlo */
         }
     </style>
 </head>
@@ -97,20 +101,23 @@
                 </select>
             </div>
 
-            <table class="table table-bordered table-striped table-responsive">
-                <thead class="table-dark">
-                    <tr>
-                        <th>Número de Empleado</th>
-                        <th>Nombre del Alumno</th>
-                        <th>Materia</th>
-                        <th>Asistió?</th>
-                        <th>Fecha de Asistencia</th>
-                    </tr>
-                </thead>
-                <tbody id="tabla-alumnos">
-                    <!-- Filas cargadas dinámicamente -->
-                </tbody>
-            </table>
+            <!-- Tabla responsiva -->
+            <div class="table-responsive">
+                <table class="table table-bordered table-striped">
+                    <thead class="table-dark">
+                        <tr>
+                            <th>Número de Empleado</th>
+                            <th>Nombre del Alumno</th>
+                            <th>Materia</th>
+                            <th>Asistió?</th>
+                            <th>Fecha de Asistencia</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-alumnos">
+                        <!-- Filas cargadas dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
 
             <div class="d-flex justify-content-center">
                 <button id="guardar-lista" class="btn btn-primary mt-3">
