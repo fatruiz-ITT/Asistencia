@@ -239,15 +239,6 @@
             const selectEmpresa = document.getElementById('materia');
             selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
             
-            const selectEmpresaVisualizar = document.getElementById('materia-visualizar');
-            selectEmpresaVisualizar.innerHTML = '<option value="">Selecciona una opción</option>';
-
-            const selectEmpresaEliminar = document.getElementById('materia-eliminar');
-            selectEmpresaEliminar.innerHTML = '<option value="">Selecciona una opción</option>';
-
-            const selectEmpresaImprimir = document.getElementById('materia-imprimir');
-            selectEmpresaImprimir.innerHTML = '<option value="">Selecciona una opción</option>';
-
             data.forEach(row => {
                 const empresa = row.c[4]?.v; // Columna E para Empresa
                 if (empresa) {
@@ -267,33 +258,23 @@
                 option.value = empresa;
                 option.textContent = empresa;
                 selectEmpresa.appendChild(option);
-                selectEmpresaVisualizar.appendChild(option.cloneNode(true));
-                selectEmpresaEliminar.appendChild(option.cloneNode(true));
-                selectEmpresaImprimir.appendChild(option.cloneNode(true));
             });
 
-            // Evento para seleccionar empresa
             selectEmpresa.addEventListener('change', () => {
                 cargarGrupos(data, selectEmpresa.value, grupos, 'grupo');
             });
 
-            selectEmpresaVisualizar.addEventListener('change', () => {
-                cargarGrupos(data, selectEmpresaVisualizar.value, grupos, 'grupo-visualizar');
-            });
-
-            selectEmpresaEliminar.addEventListener('change', () => {
-                cargarGrupos(data, selectEmpresaEliminar.value, grupos, 'grupo-eliminar');
-            });
-
-            selectEmpresaImprimir.addEventListener('change', () => {
-                cargarGrupos(data, selectEmpresaImprimir.value, grupos, 'grupo-imprimir');
+            document.getElementById('grupo').addEventListener('change', () => {
+                const materiaSeleccionada = selectEmpresa.value;
+                const grupoSeleccionado = document.getElementById('grupo').value;
+                cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
             });
         }
 
         function cargarGrupos(data, empresaSeleccionada, grupos, selectId) {
             const selectGrupo = document.getElementById(selectId);
             selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
-
+            
             if (empresaSeleccionada && grupos[empresaSeleccionada]) {
                 grupos[empresaSeleccionada].forEach(grupo => {
                     const option = document.createElement('option');
@@ -302,6 +283,33 @@
                     selectGrupo.appendChild(option);
                 });
             }
+        }
+
+        function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
+            const tablaAlumnos = document.getElementById('tabla-alumnos');
+            tablaAlumnos.innerHTML = ''; // Limpiar la tabla
+
+            const alumnosFiltrados = data.filter(row => {
+                const empresa = row.c[4]?.v; // Columna E para Empresa
+                const grupo = row.c[3]?.v;  // Columna D para Grupo
+                return empresa === materiaSeleccionada && grupo === grupoSeleccionado;
+            });
+
+            alumnosFiltrados.forEach(row => {
+                const numeroEmpleado = row.c[0]?.v; // Columna A para Número de Empleado
+                const nombreAlumno = row.c[1]?.v; // Columna B para Nombre del Alumno
+                const materia = row.c[4]?.v; // Columna E para Materia
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${numeroEmpleado}</td>
+                    <td>${nombreAlumno}</td>
+                    <td>${materia}</td>
+                    <td><input type="checkbox"></td>
+                    <td><input type="date"></td>
+                `;
+                tablaAlumnos.appendChild(tr);
+            });
         }
     </script>
 
