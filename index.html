@@ -243,22 +243,6 @@
         </div>
     </div>
     <script>
-    function setFechaHoy() {
-           var hoy = new Date();
-           var dia = hoy.getDate();
-           var mes = hoy.getMonth() + 1; // Los meses son 0-indexados
-           var anio = hoy.getFullYear();
-
-           // Asegurarse de que el día y el mes tengan dos dígitos
-           if(dia < 10) dia = '0' + dia;
-           if(mes < 10) mes = '0' + mes;
-
-           var fechaHoy = anio + '-' + mes + '-' + dia;
-           document.getElementById('fechaHoy').value = fechaHoy;
-       }
-</script>
-
-    <script>
         // Funciones de manejo de eventos
         document.getElementById('btn-anexar').addEventListener('click', () => {
             document.getElementById('form-anexar').style.display = 'block';
@@ -386,7 +370,7 @@
                     <td>${alumno}</td>
                     <td>${nombre}</td>
                     <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
-                    <td>>${materiaSeleccionada}</td>
+                    <td>${materiaSeleccionada}</td>
                 `;
                 tablaAlumnos.appendChild(tr);
             });
