@@ -62,26 +62,9 @@
         </div>
 
         <div class="menu-container mt-4">
-            <button id="btn-anexar" class="btn btn-primary btn-custom menu-item">
-                <i class="fas fa-user-plus icon-large"></i> Anexar Alumnos
-            </button>
             <button id="btn-pasar-lista" class="btn btn-success btn-custom menu-item">
                 <i class="fas fa-clipboard-list icon-large"></i> Pasar Lista
             </button>
-            <button id="btn-imprimir" class="btn btn-warning btn-custom menu-item">
-                <i class="fas fa-print icon-large"></i> Imprimir Lista
-            </button>
-            <button id="btn-visualizar" class="btn btn-info btn-custom menu-item">
-                <i class="fas fa-eye icon-large"></i> Visualizar Lista
-            </button>
-            <button id="btn-borrar" class="btn btn-danger btn-custom menu-item">
-                <i class="fas fa-trash-alt icon-large"></i> Borrar
-            </button>
-        </div>
-
-        <!-- Formularios de cada sección -->
-        <div id="form-anexar" class="mt-5" style="display: none;">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-pEVIEG2pKFc57SG7oVDWVjP_qvvz5RSTktbmFjaA6B8MnA/viewform?usp=sf_link" width="100%" height="600px" frameborder="0"></iframe>
         </div>
 
         <div id="form-pasar-lista" class="mt-5" style="display: none;">
@@ -120,121 +103,13 @@
                 </button>
             </div>
         </div>
-
-        <div id="form-visualizar-lista" class="mt-5" style="display: none;">
-            <h2 class="text-center">Visualizar Lista</h2>
-            <div class="mb-3">
-                <label for="materia-visualizar" class="form-label">Selecciona Empresa:</label>
-                <select id="materia-visualizar" class="form-select">
-                    <option value="">Selecciona una opción</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="grupo-visualizar" class="form-label">Selecciona Grupo-Materia:</label>
-                <select id="grupo-visualizar" class="form-select">
-                    <option value="">Selecciona una opción</option>
-                </select>
-            </div>
-
-            <div class="d-flex justify-content-center">
-                <button id="visualizar" class="btn btn-info mt-3">
-                    <i class="fas fa-eye"></i> Ver Lista
-                </button>
-            </div>
-        </div>
-
-        <div id="form-eliminar-lista" class="mt-5" style="display: none;">
-            <h2 class="text-center">Eliminar Lista</h2>
-            <div class="mb-3">
-                <label for="materia-eliminar" class="form-label">Selecciona Empresa:</label>
-                <select id="materia-eliminar" class="form-select">
-                    <option value="">Selecciona una opción</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="grupo-eliminar" class="form-label">Selecciona Grupo-Materia:</label>
-                <select id="grupo-eliminar" class="form-select">
-                    <option value="">Selecciona una opción</option>
-                </select>
-            </div>
-
-            <div class="d-flex justify-content-center">
-                <button id="eliminar-lista" class="btn btn-danger mt-3">
-                    <i class="fas fa-trash"></i> Eliminar Lista
-                </button>
-            </div>
-        </div>
-
-        <div id="form-imprimir-lista" class="mt-5" style="display: none;">
-            <h2 class="text-center">Imprimir Lista</h2>
-            <div class="mb-3">
-                <label for="materia-imprimir" class="form-label">Selecciona Empresa:</label>
-                <select id="materia-imprimir" class="form-select">
-                    <option value="">Selecciona una opción</option>
-                </select>
-            </div>
-
-            <div class="mb-3">
-                <label for="grupo-imprimir" class="form-label">Selecciona Grupo-Materia:</label>
-                <select id="grupo-imprimir" class="form-select">
-                    <option value="">Selecciona una opción</option>
-                </select>
-            </div>
-
-            <div class="d-flex justify-content-center">
-                <button id="imprimir-lista" class="btn btn-warning mt-3">
-                    <i class="fas fa-print"></i> Imprimir Lista
-                </button>
-            </div>
-        </div>
     </div>
 
     <script>
         // Funciones de manejo de eventos
-        document.getElementById('btn-anexar').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'block';
-            document.getElementById('form-pasar-lista').style.display = 'none';
-            document.getElementById('form-visualizar-lista').style.display = 'none';
-            document.getElementById('form-eliminar-lista').style.display = 'none';
-            document.getElementById('form-imprimir-lista').style.display = 'none';
-        });
-
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'none';
             document.getElementById('form-pasar-lista').style.display = 'block';
-            document.getElementById('form-visualizar-lista').style.display = 'none';
-            document.getElementById('form-eliminar-lista').style.display = 'none';
-            document.getElementById('form-imprimir-lista').style.display = 'none';
             cargarEmpresas(); // Cargar empresas y grupos
-        });
-
-        document.getElementById('btn-visualizar').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'none';
-            document.getElementById('form-pasar-lista').style.display = 'none';
-            document.getElementById('form-visualizar-lista').style.display = 'block';
-            document.getElementById('form-eliminar-lista').style.display = 'none';
-            document.getElementById('form-imprimir-lista').style.display = 'none';
-            cargarEmpresasVisualizar();
-        });
-
-        document.getElementById('btn-borrar').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'none';
-            document.getElementById('form-pasar-lista').style.display = 'none';
-            document.getElementById('form-visualizar-lista').style.display = 'none';
-            document.getElementById('form-eliminar-lista').style.display = 'block';
-            document.getElementById('form-imprimir-lista').style.display = 'none';
-            cargarEmpresasEliminar();
-        });
-
-        document.getElementById('btn-imprimir').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'none';
-            document.getElementById('form-pasar-lista').style.display = 'none';
-            document.getElementById('form-visualizar-lista').style.display = 'none';
-            document.getElementById('form-eliminar-lista').style.display = 'none';
-            document.getElementById('form-imprimir-lista').style.display = 'block';
-            cargarEmpresasImprimir();
         });
 
         // Funciones de carga de datos desde Google Sheets
@@ -313,152 +188,59 @@
                 const nombre = row.c[2]?.v;
                 const asistio = row.c[3]?.v;
                 const fechaAsistencia = row.c[5]?.v;
-// SI QUIERO VER MATERIA id grupoSeleccionado SI QUIER VER EMPRESA materiaSeleccionada
+
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${alumno}</td>
                     <td>${nombre}</td>
                     <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
-                   <td><input type="date"></td>
+                    <td><input type="date"></td>
                 `;
                 tablaAlumnos.appendChild(tr);
             });
         }
 
-        // Funciones de carga para los formularios de Visualizar, Eliminar e Imprimir
-        async function cargarEmpresasVisualizar() {
-            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
-            const response = await fetch(sheetURL);
-            const text = await response.text();
-            const json = JSON.parse(text.substring(47).slice(0, -2));
+        // Función para guardar datos en Google Sheets
+        document.getElementById('guardar-lista').addEventListener('click', async () => {
+            const empresa = document.getElementById('materia').value;
+            const grupo = document.getElementById('grupo').value;
+            const fecha = new Date().toISOString().split('T')[0]; // Fecha de hoy
 
-            const empresas = new Set();
-            const grupos = {};
-            const data = json.table.rows;
-            const selectEmpresa = document.getElementById('materia-visualizar');
-            selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
+            const alumnos = [];
+            const filas = document.querySelectorAll('#tabla-alumnos tr');
+            filas.forEach(fila => {
+                const columnas = fila.getElementsByTagName('td');
+                const numeroEmpleado = columnas[0].textContent;
+                const nombreAlumno = columnas[1].textContent;
+                const asistio = columnas[2].querySelector('input').checked ? 'Sí' : 'No';
+                const fechaAsistencia = columnas[3].querySelector('input').value || fecha;
 
-            data.forEach(row => {
-                const empresa = row.c[4]?.v; // Columna E para Empresa
-                if (empresa) {
-                    empresas.add(empresa);
-                    const grupo = row.c[3]?.v; // Columna D para Grupo
-                    if (grupo && !grupos[empresa]) {
-                        grupos[empresa] = new Set();
-                    }
-                    if (grupo) {
-                        grupos[empresa].add(grupo);
-                    }
-                }
+                alumnos.push([numeroEmpleado, nombreAlumno, asistio, fechaAsistencia]);
             });
 
-            empresas.forEach(empresa => {
-                const option = document.createElement('option');
-                option.value = empresa;
-                option.textContent = empresa;
-                selectEmpresa.appendChild(option);
-            });
+            const tabName = `${fecha}-${grupo}-${empresa}`; // El nombre del tab
 
-            selectEmpresa.addEventListener('change', () => {
-                cargarGrupos(data, selectEmpresa.value, grupos, 'grupo-visualizar');
-            });
+            // Llamada a la API de Google Apps Script
+            const scriptURL = `https://script.google.com/macros/s/1iDcoyoD-1BmPxgwKS59QRgDyREGBu4sV_gK1wUZQ6V5s2cMcEIYqerGC/exec`;
+            const params = {
+                method: 'POST',
+                body: JSON.stringify({
+                    tabName: tabName,
+                    alumnos: alumnos,
+                    fecha: fecha,
+                    empresa: empresa,
+                    grupo: grupo
+                })
+            };
 
-            document.getElementById('grupo-visualizar').addEventListener('change', () => {
-                const materiaSeleccionada = selectEmpresa.value;
-                const grupoSeleccionado = document.getElementById('grupo-visualizar').value;
-                cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
-            });
-        }
-
-        // Función para cargar empresas en el formulario de eliminación
-        async function cargarEmpresasEliminar() {
-            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
-            const response = await fetch(sheetURL);
-            const text = await response.text();
-            const json = JSON.parse(text.substring(47).slice(0, -2));
-
-            const empresas = new Set();
-            const grupos = {};
-            const data = json.table.rows;
-            const selectEmpresa = document.getElementById('materia-eliminar');
-            selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
-
-            data.forEach(row => {
-                const empresa = row.c[4]?.v; // Columna E para Empresa
-                if (empresa) {
-                    empresas.add(empresa);
-                    const grupo = row.c[3]?.v; // Columna D para Grupo
-                    if (grupo && !grupos[empresa]) {
-                        grupos[empresa] = new Set();
-                    }
-                    if (grupo) {
-                        grupos[empresa].add(grupo);
-                    }
-                }
-            });
-
-            empresas.forEach(empresa => {
-                const option = document.createElement('option');
-                option.value = empresa;
-                option.textContent = empresa;
-                selectEmpresa.appendChild(option);
-            });
-
-            selectEmpresa.addEventListener('change', () => {
-                cargarGrupos(data, selectEmpresa.value, grupos, 'grupo-eliminar');
-            });
-
-            document.getElementById('grupo-eliminar').addEventListener('change', () => {
-                const materiaSeleccionada = selectEmpresa.value;
-                const grupoSeleccionado = document.getElementById('grupo-eliminar').value;
-                cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
-            });
-        }
-
-        // Función para cargar empresas en el formulario de impresión
-        async function cargarEmpresasImprimir() {
-            const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
-            const response = await fetch(sheetURL);
-            const text = await response.text();
-            const json = JSON.parse(text.substring(47).slice(0, -2));
-
-            const empresas = new Set();
-            const grupos = {};
-            const data = json.table.rows;
-            const selectEmpresa = document.getElementById('materia-imprimir');
-            selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
-
-            data.forEach(row => {
-                const empresa = row.c[4]?.v; // Columna E para Empresa
-                if (empresa) {
-                    empresas.add(empresa);
-                    const grupo = row.c[3]?.v; // Columna D para Grupo
-                    if (grupo && !grupos[empresa]) {
-                        grupos[empresa] = new Set();
-                    }
-                    if (grupo) {
-                        grupos[empresa].add(grupo);
-                    }
-                }
-            });
-
-            empresas.forEach(empresa => {
-                const option = document.createElement('option');
-                option.value = empresa;
-                option.textContent = empresa;
-                selectEmpresa.appendChild(option);
-            });
-
-            selectEmpresa.addEventListener('change', () => {
-                cargarGrupos(data, selectEmpresa.value, grupos, 'grupo-imprimir');
-            });
-
-            document.getElementById('grupo-imprimir').addEventListener('change', () => {
-                const materiaSeleccionada = selectEmpresa.value;
-                const grupoSeleccionado = document.getElementById('grupo-imprimir').value;
-                cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
-            });
-        }
+            const response = await fetch(scriptURL, params);
+            const result = await response.json();
+            if (result.success) {
+                alert('Datos guardados exitosamente!');
+            } else {
+                alert('Hubo un error al guardar los datos.');
+            }
+        });
     </script>
 </body>
 </html>
