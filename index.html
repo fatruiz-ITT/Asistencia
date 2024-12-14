@@ -138,7 +138,7 @@
             </div>
 
             <div class="d-flex justify-content-center">
-                <button id="visualizar" class="btn btn-info mt-3">
+                <button id="modal-visualizar" class="btn btn-info mt-3">
                     <i class="fas fa-eye"></i> Ver Lista
                 </button>
             </div>
@@ -190,6 +190,91 @@
             </div>
         </div>
     </div>
+
+    <!-- Modal para mostrar la lista de alumnos -->
+<div class="modal fade" id="modal-visualizar" tabindex="-1" aria-labelledby="modalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="modalLabel">Lista de Alumnos</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <div class="table-responsive">
+                    <table class="table table-bordered table-striped">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Número de Empleado</th>
+                                <th>Nombre del Alumno</th>
+                                <th>Asistió?</th>
+                                <th>Fecha de Asistencia</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tabla-alumnos-modal"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="guardar-lista-modal">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script para manejar la apertura del modal -->
+<script>
+    // Al seleccionar los valores en el dropdown de visualizar
+    document.getElementById('visualizar').addEventListener('click', () => {
+        const materiaSeleccionada = document.getElementById('materia-visualizar').value;
+        const grupoSeleccionado = document.getElementById('grupo-visualizar').value;
+
+        if (materiaSeleccionada && grupoSeleccionado) {
+            cargarAlumnosParaModal(materiaSeleccionada, grupoSeleccionado);
+            const myModal = new bootstrap.Modal(document.getElementById('modal-visualizar'));
+            myModal.show(); // Abre el modal
+        } else {
+            alert("Por favor selecciona una materia y un grupo.");
+        }
+    });
+
+    // Función para cargar los alumnos en el modal
+    function cargarAlumnosParaModal(materiaSeleccionada, grupoSeleccionado) {
+        const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
+        fetch(sheetURL)
+            .then(response => response.text())
+            .then(text => {
+                const json = JSON.parse(text.substring(47).slice(0, -2));
+                const data = json.table.rows;
+                const tablaAlumnosModal = document.getElementById('tabla-alumnos-modal');
+                tablaAlumnosModal.innerHTML = ''; // Limpiar la tabla antes de cargar nuevos datos
+
+                const alumnosFiltrados = data.filter(row => {
+                    const empresa = row.c[4]?.v; // Columna E para Empresa
+                    const grupo = row.c[3]?.v;  // Columna D para Grupo
+                    return empresa === materiaSeleccionada && grupo === grupoSeleccionado;
+                });
+
+                alumnosFiltrados.forEach(row => {
+                    const alumno = row.c[1]?.v;
+                    const nombre = row.c[2]?.v;
+                    const asistio = row.c[3]?.v;
+                    const fechaAsistencia = row.c[5]?.v;
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${alumno}</td>
+                        <td>${nombre}</td>
+                        <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
+                        <td><input type="date" value="${fechaAsistencia}"></td>
+                    `;
+                    tablaAlumnosModal.appendChild(tr);
+                });
+            })
+            .catch(error => console.error('Error al cargar los datos:', error));
+    }
+</script>
+
 
     <script>
         // Funciones de manejo de eventos
