@@ -106,7 +106,6 @@
                         <tr>
                             <th>Número de Empleado</th>
                             <th>Nombre del Alumno</th>
-                            <th>Materia</th>
                             <th>Asistió?</th>
                             <th>Fecha de Asistencia</th>
                         </tr>
@@ -314,12 +313,11 @@
                 const nombre = row.c[2]?.v;
                 const asistio = row.c[3]?.v;
                 const fechaAsistencia = row.c[5]?.v;
-
+// SI QUIERO VER MATERIA id grupoSeleccionado SI QUIER VER EMPRESA materiaSeleccionada
                 const tr = document.createElement('tr');
                 tr.innerHTML = `
                     <td>${alumno}</td>
                     <td>${nombre}</td>
-                    <td>${grupoSeleccionado}</td>
                     <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
                    <td><input type="date"></td>
                 `;
