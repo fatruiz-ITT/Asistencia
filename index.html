@@ -77,15 +77,15 @@
         <div id="form-pasar-lista" class="mt-5" style="display: none;">
             <h2 class="text-center">Pasar Lista</h2>
             <div class="mb-3">
-                <label for="materia" class="form-label">Selecciona Empresa:</label>
-                <select id="materia" class="form-select">
+                <label for="empresa" class="form-label">Selecciona Empresa:</label>
+                <select id="empresa" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
 
             <div class="mb-3">
-                <label for="grupo" class="form-label">Selecciona Grupo:</label>
-                <select id="grupo" class="form-select">
+                <label for="grupo-materia" class="form-label">Selecciona Grupo-Materia:</label>
+                <select id="grupo-materia" class="form-select">
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
@@ -122,79 +122,59 @@
         document.getElementById('btn-pasar-lista').addEventListener('click', () => {
             document.getElementById('form-anexar').style.display = 'none';
             document.getElementById('form-pasar-lista').style.display = 'block';
-            cargarMaterias();
+            cargarDatos();
         });
 
-        async function cargarMaterias() {
+        async function cargarDatos() {
             const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
             const response = await fetch(sheetURL);
             const text = await response.text();
             const json = JSON.parse(text.substring(47).slice(0, -2));
 
-            const materias = new Set();
+            const empresas = new Set();
+            const grupoMateria = new Set();
             const data = json.table.rows;
-            const selectMateria = document.getElementById('materia');
-            selectMateria.innerHTML = '<option value="">Selecciona una opción</option>';
+            const selectEmpresa = document.getElementById('empresa');
+            const selectGrupoMateria = document.getElementById('grupo-materia');
 
+            selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
+            selectGrupoMateria.innerHTML = '<option value="">Selecciona una opción</option>';
+
+            // Cargar las opciones de empresa y grupo-materia
             data.forEach(row => {
-                materias.add(row.c[3]?.v || "");
+                empresas.add(row.c[4]?.v || "");  // Columna E: Empresa
+                grupoMateria.add(row.c[3]?.v || ""); // Columna D: Grupo-Materia
             });
 
-            materias.forEach(materia => {
+            empresas.forEach(empresa => {
                 const option = document.createElement('option');
-                option.value = materia;
-                option.textContent = materia;
-                selectMateria.appendChild(option);
+                option.value = empresa;
+                option.textContent = empresa;
+                selectEmpresa.appendChild(option);
             });
 
-            selectMateria.addEventListener('change', () => cargarGruposYHorarios(data, selectMateria.value));
-        }
-
-        function cargarGruposYHorarios(data, materiaSeleccionada) {
-            const selectGrupo = document.getElementById('grupo');
-            const selectHorario = document.getElementById('horario');
-            selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
-            selectHorario.innerHTML = '<option value="">Selecciona una opción</option>';
-
-            const grupos = new Set();
-            const horarios = new Set();
-
-            data.forEach(row => {
-                if (row.c[3]?.v === materiaSeleccionada) {
-                    grupos.add(row.c[4]?.v || "");
-                    horarios.add(row.c[5]?.v || "");
-                }
-            });
-
-            grupos.forEach(grupo => {
+            grupoMateria.forEach(grupo => {
                 const option = document.createElement('option');
                 option.value = grupo;
                 option.textContent = grupo;
-                selectGrupo.appendChild(option);
+                selectGrupoMateria.appendChild(option);
             });
 
-            horarios.forEach(horario => {
-                const option = document.createElement('option');
-                option.value = horario;
-                option.textContent = horario;
-                selectHorario.appendChild(option);
-            });
-
-            selectGrupo.addEventListener('change', () => cargarTabla(data, materiaSeleccionada, selectGrupo.value));
+            selectGrupoMateria.addEventListener('change', () => cargarTabla(data, selectGrupoMateria.value));
         }
 
-        function cargarTabla(data, materiaSeleccionada, grupoSeleccionado) {
+        function cargarTabla(data, grupoMateriaSeleccionado) {
             const tbody = document.getElementById('tabla-alumnos');
             tbody.innerHTML = '';
 
             data.forEach(row => {
-                if (row.c[3]?.v === materiaSeleccionada && row.c[4]?.v === grupoSeleccionado) {
+                if (row.c[3]?.v === grupoMateriaSeleccionado) {  // Columna D: Grupo-Materia
                     const tr = document.createElement('tr');
 
                     tr.innerHTML = `
-                        <td>${row.c[2]?.v || ""}</td>
-                        <td>${row.c[1]?.v || ""}</td>
-                        <td>${row.c[3]?.v || ""}</td>
+                        <td>${row.c[1]?.v || ""}</td> <!-- Columna B: Número de Empleado -->
+                        <td>${row.c[2]?.v || ""}</td> <!-- Columna C: Nombre del Alumno -->
+                        <td>${row.c[3]?.v || ""}</td> <!-- Columna D: Materia -->
                         <td><input type="checkbox" class="form-check-input"></td>
                         <td>${new Date().toLocaleDateString()}</td>
                     `;
