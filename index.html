@@ -242,6 +242,7 @@
             </div>
         </div>
     </div>
+
     <script>
         // Funciones de manejo de eventos
         document.getElementById('btn-anexar').addEventListener('click', () => {
@@ -352,6 +353,7 @@
         function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
             const tablaAlumnos = document.getElementById('tabla-alumnos');
             tablaAlumnos.innerHTML = ''; // Limpiar la tabla
+
             const alumnosFiltrados = data.filter(row => {
                 const empresa = row.c[4]?.v; // Columna E para Empresa
                 const grupo = row.c[3]?.v;  // Columna D para Grupo
@@ -369,7 +371,7 @@
                     <td>${alumno}</td>
                     <td>${nombre}</td>
                     <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
-                    <td>"texto"</td>
+                    <td><input type="date" id="dateInput"></td>
                 `;
                 tablaAlumnos.appendChild(tr);
             });
@@ -509,5 +511,25 @@
                 cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
             });
         }
+    </script>
+    <script>
+    // Get the current date
+    var today = new Date();
+
+    // Format the date as YYYY-MM-DD
+    var yyyy = today.getFullYear();
+    var mm = today.getMonth() + 1; // Months are zero-indexed
+    var dd = today.getDate();
+
+    // Add leading zero for single-digit months and days
+    if (mm < 10) mm = '0' + mm;
+    if (dd < 10) dd = '0' + dd;
+
+    // Combine date components into YYYY-MM-DD format
+    var formattedDate = yyyy + '-' + mm + '-' + dd;
+
+    // Set the value of the input field to today's date
+    document.getElementById("dateInput").value = formattedDate;
+</script>
 </body>
 </html>
