@@ -1,4 +1,4 @@
-<!DOCTYPE html> 
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -28,10 +28,13 @@
         .icon-large {
             font-size: 24px;
         }
+        .checkbox-center {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
         .form-check-input {
             transform: scale(1.5);
-            margin: auto;
-            display: block;
         }
     </style>
 </head>
@@ -48,36 +51,29 @@
             <button id="btn-pasar-lista" class="btn btn-success btn-custom">
                 <i class="fas fa-clipboard-list icon-large"></i> Pasar Lista
             </button>
-            <button id="btn-borrar" class="btn btn-danger btn-custom">
-                <i class="fas fa-trash-alt icon-large"></i> Borrar
-            </button>
         </div>
 
-        <div id="form-anexar" class="mt-5" style="display: none;">
-            <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-pEVIEG2pKFc57SG7oVDWVjP_qvvz5RSTktbmFjaA6B8MnA/viewform?usp=sf_link" width="100%" height="600px" frameborder="0"></iframe>
-        </div>
-
-        <div id="form-pasar-lista" class="mt-5" style="display: none;">
+        <div id="form-pasar-lista" class="mt-5">
             <h2 class="text-center">Pasar Lista</h2>
 
             <div class="mb-3">
                 <label for="materia" class="form-label">Selecciona Materia:</label>
                 <select id="materia" class="form-select">
-                    <option value="">Selecciona una opción</option>
+                    <!-- Opciones cargadas dinámicamente -->
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="grupo" class="form-label">Salón-Grupo:</label>
                 <select id="grupo" class="form-select">
-                    <option value="">Selecciona una opción</option>
+                    <!-- Opciones cargadas dinámicamente -->
                 </select>
             </div>
 
             <div class="mb-3">
                 <label for="horario" class="form-label">Horario:</label>
                 <select id="horario" class="form-select">
-                    <option value="">Selecciona una opción</option>
+                    <!-- Opciones cargadas dinámicamente -->
                 </select>
             </div>
 
@@ -105,30 +101,26 @@
     </div>
 
     <script>
-        document.getElementById('btn-anexar').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'block';
-            document.getElementById('form-pasar-lista').style.display = 'none';
-        });
-
-        document.getElementById('btn-pasar-lista').addEventListener('click', () => {
-            document.getElementById('form-anexar').style.display = 'none';
-            document.getElementById('form-pasar-lista').style.display = 'block';
-            cargarMaterias();
-        });
-
-        async function cargarMaterias() {
+        // Cargar datos desde el Google Sheet
+        async function cargarDatos() {
             const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
             const response = await fetch(sheetURL);
             const text = await response.text();
             const json = JSON.parse(text.substring(47).slice(0, -2));
 
+            return json.table.rows;
+        }
+
+        async function cargarMaterias() {
+            const data = await cargarDatos();
             const materias = new Set();
-            const data = json.table.rows;
             const selectMateria = document.getElementById('materia');
-            selectMateria.innerHTML = '<option value="">Selecciona una opción</option>';
+
+            selectMateria.innerHTML = '';
 
             data.forEach(row => {
-                materias.add(row.c[3]?.v || "");
+                const materia = row.c[3]?.v || "";
+                if (materia) materias.add(materia);
             });
 
             materias.forEach(materia => {
@@ -138,22 +130,19 @@
                 selectMateria.appendChild(option);
             });
 
-            selectMateria.addEventListener('change', () => cargarGruposYHorarios(data, selectMateria.value));
+            selectMateria.addEventListener('change', () => cargarGrupos(data, selectMateria.value));
         }
 
-        function cargarGruposYHorarios(data, materiaSeleccionada) {
-            const selectGrupo = document.getElementById('grupo');
-            const selectHorario = document.getElementById('horario');
-            selectGrupo.innerHTML = '<option value="">Selecciona una opción</option>';
-            selectHorario.innerHTML = '<option value="">Selecciona una opción</option>';
-
+        function cargarGrupos(data, materiaSeleccionada) {
             const grupos = new Set();
-            const horarios = new Set();
+            const selectGrupo = document.getElementById('grupo');
+
+            selectGrupo.innerHTML = '';
 
             data.forEach(row => {
                 if (row.c[3]?.v === materiaSeleccionada) {
-                    grupos.add(row.c[4]?.v || "");
-                    horarios.add(row.c[5]?.v || "");
+                    const grupo = row.c[4]?.v || "";
+                    if (grupo) grupos.add(grupo);
                 }
             });
 
@@ -164,6 +153,22 @@
                 selectGrupo.appendChild(option);
             });
 
+            selectGrupo.addEventListener('change', () => cargarHorarios(data, materiaSeleccionada, selectGrupo.value));
+        }
+
+        function cargarHorarios(data, materiaSeleccionada, grupoSeleccionado) {
+            const horarios = new Set();
+            const selectHorario = document.getElementById('horario');
+
+            selectHorario.innerHTML = '';
+
+            data.forEach(row => {
+                if (row.c[3]?.v === materiaSeleccionada && row.c[4]?.v === grupoSeleccionado) {
+                    const horario = row.c[5]?.v || "";
+                    if (horario) horarios.add(horario);
+                }
+            });
+
             horarios.forEach(horario => {
                 const option = document.createElement('option');
                 option.value = horario;
@@ -171,22 +176,26 @@
                 selectHorario.appendChild(option);
             });
 
-            selectGrupo.addEventListener('change', () => cargarTabla(data, materiaSeleccionada, selectGrupo.value));
+            selectHorario.addEventListener('change', () => cargarTabla(data, materiaSeleccionada, grupoSeleccionado, selectHorario.value));
         }
 
-        function cargarTabla(data, materiaSeleccionada, grupoSeleccionado) {
+        function cargarTabla(data, materiaSeleccionada, grupoSeleccionado, horarioSeleccionado) {
             const tbody = document.getElementById('tabla-alumnos');
             tbody.innerHTML = '';
 
             data.forEach(row => {
-                if (row.c[3]?.v === materiaSeleccionada && row.c[4]?.v === grupoSeleccionado) {
+                if (
+                    row.c[3]?.v === materiaSeleccionada &&
+                    row.c[4]?.v === grupoSeleccionado &&
+                    row.c[5]?.v === horarioSeleccionado
+                ) {
                     const tr = document.createElement('tr');
 
                     tr.innerHTML = `
                         <td>${row.c[2]?.v || ""}</td>
                         <td>${row.c[1]?.v || ""}</td>
                         <td>${row.c[3]?.v || ""}</td>
-                        <td><input type="checkbox" class="form-check-input"></td>
+                        <td class="checkbox-center"><input type="checkbox" class="form-check-input"></td>
                         <td>${new Date().toLocaleDateString()}</td>
                     `;
 
@@ -194,6 +203,10 @@
                 }
             });
         }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarMaterias();
+        });
     </script>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha3/dist/js/bootstrap.bundle.min.js"></script>
