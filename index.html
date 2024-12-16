@@ -160,15 +160,19 @@
                 }
               });
               // Comprobar la respuesta en consola
-              const result = await response.json();
-     if (result.success) {
-       alert('Datos guardados correctamente en Google Sheets');
-     } else {
-       alert('Error al guardar datos: ' + result.error);
-     }
-   } catch (error) {
-     alert('Error de red: ' + error.message);
-   }
+            const result = await response.json();
+            console.log(response);
+
+              // Comprobar si la respuesta es exitosa
+              if (response.ok) {
+                alert('Datos guardados correctamente en Google Sheets');
+              } else {
+                alert('Hubo un error al guardar los datos: ' + response.statusText);
+              }
+            } catch (error) {
+              alert('Error de red: ' + error.message);
+            }
+          });
         </script>
 
 
