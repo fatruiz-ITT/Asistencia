@@ -1,31 +1,47 @@
-document.addEventListener("DOMContentLoaded", function() {
-    // Función para obtener la fecha actual en formato dd-mm-yyyy
-    function obtenerFechaActual() {
-        const fecha = new Date();
-        const dia = String(fecha.getDate()).padStart(2, '0');
-        const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses empiezan desde 0
-        const anio = fecha.getFullYear();
-        return `${dia}-${mes}-${anio}`;
-    }
+document.getElementById('guardar-lista').addEventListener('click', async () => {
+    const tabla = document.getElementById('tabla-alumnos');
+    const filas = tabla.querySelectorAll('tr');
+    const datos = [];
 
-    // Función para colocar la fecha actual en las filas de la tabla de asistencia
-    function colocarFechaAsistencia() {
-        const filas = document.querySelectorAll("#tabla-alumnos tr"); // Seleccionamos las filas de la tabla
-        const fechaActual = obtenerFechaActual();
+    filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length > 0) {
+            // Recolectamos solo los 4 elementos que necesitas
+            const numeroEmpleado = celdas[0]?.textContent.trim(); // Número de Empleado
+            const nombreAlumno = celdas[1]?.textContent.trim();   // Nombre del Alumno
+            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No'; // Asistió?
+            const fechaAsistencia = celdas[3]?.textContent.trim(); // Fecha de Asistencia
 
-        filas.forEach(fila => {
-            // Selecciona la celda correspondiente a la "Fecha de Asistencia"
-            const celdaFecha = fila.querySelector("td:nth-child(4)");
-            if (celdaFecha && !celdaFecha.textContent) {
-                // Coloca la fecha actual en la celda, solo si está vacía
-                celdaFecha.textContent = fechaActual;
-            }
+            // Creamos una fila de datos con estos 4 elementos
+            const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
+            datos.push(filaDatos); // Agrega la fila de datos
+        }
+    });
+
+    // URL del Web App de Google Apps Script (reemplaza con la URL que copiaste)
+    const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec'; // Reemplaza con la URL de tu Web App
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ datos: datos })
         });
-    }
 
-    // Llamamos a la función para actualizar la fecha cuando la página se carga
-    colocarFechaAsistencia();
+        const result = await response.json();
+        if (result.success) {
+            alert('Datos guardados exitosamente');
+        } else {
+            alert('Hubo un problema al guardar los datos');
+        }
+    } catch (error) {
+        console.error('Error al enviar los datos:', error);
+        alert('Error al enviar los datos');
+    }
 });
+
 
 
 // Funciones de manejo de eventos
@@ -155,7 +171,7 @@ function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
             <td>${alumno}</td>
             <td>${nombre}</td>
             <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
-            <td>"test"</td>
+            <td>${materiaSeleccionada}</td>
         `;
         tablaAlumnos.appendChild(tr);
     });
