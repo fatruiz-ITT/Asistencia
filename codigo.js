@@ -109,8 +109,6 @@ if (botonGuardar) {
     botonGuardar.addEventListener('click', guardarListaEnDrive);
 }
 
-
-
 // Funciones de manejo de eventos
 document.getElementById('btn-anexar').addEventListener('click', () => {
     document.getElementById('form-anexar').style.display = 'block';
@@ -156,6 +154,8 @@ document.getElementById('btn-imprimir').addEventListener('click', () => {
     cargarEmpresasImprimir();
 });
 
+const FOLDER_ID = "1HO_fZ_kqtEgyD9dWLcFnFA_nRd8UenkU"; // ID de la carpeta en Drive
+
 document.getElementById('visualizar').addEventListener('click', async () => {
     const empresa = document.getElementById('materia-visualizar').value;
     const grupo = document.getElementById('grupo-visualizar').value;
@@ -166,33 +166,59 @@ document.getElementById('visualizar').addEventListener('click', async () => {
         return;
     }
 
-    // URL del archivo que contiene los datos
-    const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
-    const response = await fetch(sheetURL);
-    const text = await response.text();
-    const json = JSON.parse(text.substring(47).slice(0, -2));
+    // Construir el nombre del archivo
+    const fechaFormato = formatearFechaArchivo(fecha); // Formato: dic 16 de 2024
+    const nombreArchivo = `${empresa}-${grupo}-${fechaFormato}`;
 
-    const data = json.table.rows;
+    try {
+        const accessToken = await renovarAccessToken();
+        const archivo = await buscarArchivoEnDrive(nombreArchivo, accessToken);
 
-    // Filtrar los datos según los criterios seleccionados
-    const resultados = data
-        .map(row => ({
-            numeroEmpleado: row.c[0]?.v || '', // Columna A
-            nombre: row.c[1]?.v || '',         // Columna B
-            asistio: row.c[2]?.v || '',        // Columna C
-            empresa: row.c[4]?.v || ''         // Columna E
-        }))
-        .filter(item => item.empresa === empresa && grupo === grupo);
-
-    // Mostrar los resultados
-    mostrarTabla(resultados, fecha);
+        if (archivo) {
+            const contenido = await descargarContenidoArchivo(archivo.id, accessToken);
+            mostrarTabla(contenido, fecha);
+        } else {
+            alert('No se encontró un archivo con ese nombre.');
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert('Ocurrió un error al buscar el archivo.');
+    }
 });
 
-function mostrarTabla(datos, fecha) {
+// Buscar archivo en Google Drive usando el Access Token
+async function buscarArchivoEnDrive(nombreArchivo, accessToken) {
+    const url = `https://www.googleapis.com/drive/v3/files?q="'${FOLDER_ID}' in parents and name='${nombreArchivo}'"&fields=files(id,name)"`;
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+
+    const data = await response.json();
+    return data.files && data.files.length > 0 ? data.files[0] : null;
+}
+
+// Descargar el contenido del archivo
+async function descargarContenidoArchivo(fileId, accessToken) {
+    const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+    const response = await fetch(url, {
+        headers: {
+            'Authorization': `Bearer ${accessToken}`
+        }
+    });
+    return await response.text(); // Se espera texto plano o CSV
+}
+
+// Mostrar la tabla con los datos
+function mostrarTabla(contenido, fecha) {
+    const filas = contenido.trim().split('\n');
+    const datos = filas.map(fila => fila.split(','));
+
     const contenedor = document.createElement('div');
     contenedor.className = 'container mt-3';
     contenedor.innerHTML = `
-        <h3 class="text-center">Lista del día ${formatearFecha(fecha)}</h3>
+        <h3 class="text-center">Lista del día ${formatearFechaVisual(fecha)}</h3>
         <table class="table table-bordered">
             <thead class="table-dark">
                 <tr>
@@ -205,43 +231,29 @@ function mostrarTabla(datos, fecha) {
             <tbody>
                 ${datos.map(d => `
                     <tr>
-                        <td>${d.numeroEmpleado}</td>
-                        <td>${d.nombre}</td>
-                        <td>${d.asistio}</td>
-                        <td>${d.empresa}</td>
+                        <td>${d[0]}</td>
+                        <td>${d[1]}</td>
+                        <td>${d[2]}</td>
+                        <td>${d[3]}</td>
                     </tr>`).join('')}
             </tbody>
         </table>
     `;
-
-    // Mostrar el contenedor en un modal
-    const modal = document.createElement('div');
-    modal.className = 'modal fade';
-    modal.id = 'modalLista';
-    modal.tabIndex = '-1';
-    modal.innerHTML = `
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Lista</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    ${contenedor.innerHTML}
-                </div>
-            </div>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-    const modalInstance = new bootstrap.Modal(document.getElementById('modalLista'));
-    modalInstance.show();
+    document.body.appendChild(contenedor);
 }
 
-function formatearFecha(fecha) {
+// Formatear fecha para el nombre del archivo
+function formatearFechaArchivo(fecha) {
+    const opciones = { day: '2-digit', month: 'short', year: 'numeric' };
+    return new Date(fecha).toLocaleDateString('es-ES', opciones).replace(/ /g, ' ');
+}
+
+// Formatear fecha para el título
+function formatearFechaVisual(fecha) {
     const opciones = { day: '2-digit', month: 'long', year: 'numeric' };
     return new Date(fecha).toLocaleDateString('es-ES', opciones);
 }
+
 
 // Funciones de carga de datos desde Google Sheets
 async function cargarEmpresas() {
