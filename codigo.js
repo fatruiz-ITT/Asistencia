@@ -1,3 +1,37 @@
+// Función para renovar el token de acceso
+async function renovarAccessToken() {
+    const clientId = '355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com';
+    const clientSecret = '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';
+    const refreshToken = '1//046SR2Bd895DvCgYIARAAGAQSNwF-L9IrjlTcWBE6ibiN0dIHd-AyC1LYzIs0dFG1UjUQ7fLSPFweb3_5-ViUgLsjgMdQwnc9vd0';
+
+    const body = new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token'
+    });
+
+    try {
+        const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: body.toString()
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.access_token;
+        } else {
+            console.error('Error al renovar el token de acceso:', await response.text());
+            alert('No se pudo renovar el token de acceso.');
+        }
+    } catch (error) {
+        console.error('Error al renovar el token:', error);
+    }
+}
+
 // Función para guardar la lista en Google Drive
 async function guardarListaEnDrive() {
     const tablaAlumnos = document.getElementById('tabla-alumnos');
@@ -28,8 +62,14 @@ async function guardarListaEnDrive() {
     // Convertir datos a formato de texto
     const contenido = datos.join('\n');
 
+    // Renovar el token de acceso antes de subir el archivo
+    const accessToken = await renovarAccessToken();
+    if (!accessToken) {
+        alert('No se pudo obtener el token de acceso. Inténtalo nuevamente.');
+        return;
+    }
+
     // Subir el archivo a Google Drive
-    const accessToken = 'ya29.a0ARW5m75SpItg_dJ_0o5ohTEjKjsHZPDW1oJtLmjOWxz5joXvYZGdQv9-uKw7vyigsP7I7Nto8TlpQC0uoBMUVnRiYsnh-0F6VAIHOsY0sUWirkmO35L1DzSX4W27KXdXgMgNcvsJcVqBplawFqCWKkQ7P4yH1qmVewaCgYKATQSARESFQHGX2MiflrBmSM0FElSn1F3YCSevw0169'; // Reemplaza con tu token de acceso válido
     const fileMetadata = {
         name: nombreArchivo,
         mimeType: 'application/vnd.google-apps.file',
@@ -53,8 +93,9 @@ async function guardarListaEnDrive() {
         if (response.ok) {
             alert('Lista guardada exitosamente en Google Drive.');
         } else {
-            console.error('Error al guardar el archivo:', await response.text());
-            alert('Ocurrió un error al guardar la lista.');
+            const errorDetails = await response.json();
+            console.error('Error al guardar el archivo:', errorDetails);
+            alert(`Error al guardar la lista: ${errorDetails.error.message || 'Desconocido'}`);
         }
     } catch (error) {
         console.error('Error al guardar la lista en Drive:', error);
@@ -67,6 +108,7 @@ const botonGuardar = document.getElementById('guardar-lista');
 if (botonGuardar) {
     botonGuardar.addEventListener('click', guardarListaEnDrive);
 }
+
 
 
 // Funciones de manejo de eventos
