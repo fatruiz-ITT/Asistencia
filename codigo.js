@@ -1,4 +1,63 @@
+// Función para guardar la lista en Google Drive
+async function guardarListaEnDrive() {
+    const tablaAlumnos = document.getElementById('tabla-alumnos');
+    const filas = tablaAlumnos.querySelectorAll('tr');
+    const datos = [];
 
+    // Recopilar datos de la tabla
+    filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length > 0) {
+            const alumno = celdas[0].textContent.trim();
+            const nombre = celdas[1].textContent.trim();
+            const asistio = celdas[2].querySelector('input').checked ? 'Sí' : 'No';
+            const materia = celdas[3].textContent.trim();
+            datos.push(`${alumno},${nombre},${asistio},${materia}`);
+        }
+    });
+
+    // Convertir datos a formato de texto
+    const contenido = datos.join('\n');
+
+    // Subir el archivo a Google Drive
+    const accessToken = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com&redirect_uri=https://fatruiz-itt.github.io/Asistencia/&response_type=code&scope=https://www.googleapis.com/auth/drive.file&access_type=offline'; // Reemplaza con tu token de acceso válido
+    const fileMetadata = {
+        name: `lista_alumnos_${new Date().toISOString()}.txt`,
+        mimeType: 'application/vnd.google-apps.file',
+        parents: ['1HO_fZ_kqtEgyD9dWLcFnFA_nRd8UenkU'] // ID de la carpeta en Drive
+    };
+    const fileContent = new Blob([contenido], { type: 'text/plain' });
+
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(fileMetadata)], { type: 'application/json' }));
+    form.append('file', fileContent);
+
+    try {
+        const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
+            method: 'POST',
+            headers: {
+                Authorization: `Bearer ${accessToken}`
+            },
+            body: form
+        });
+
+        if (response.ok) {
+            alert('Lista guardada exitosamente en Google Drive.');
+        } else {
+            console.error('Error al guardar el archivo:', await response.text());
+            alert('Ocurrió un error al guardar la lista.');
+        }
+    } catch (error) {
+        console.error('Error al guardar la lista en Drive:', error);
+        alert('Ocurrió un error al guardar la lista.');
+    }
+}
+
+// Agregar evento al botón de guardar
+const botonGuardar = document.getElementById('guardar-lista');
+if (botonGuardar) {
+    botonGuardar.addEventListener('click', guardarListaEnDrive);
+}
 
 // Funciones de manejo de eventos
 document.getElementById('btn-anexar').addEventListener('click', () => {
