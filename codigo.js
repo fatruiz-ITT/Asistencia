@@ -161,24 +161,28 @@ document.getElementById('visualizar').addEventListener('click', async () => {
     const grupo = document.getElementById('grupo-visualizar').value;
     const fecha = document.getElementById('fecha-visualizar').value;
 
+    // Validación de los campos
     if (!empresa || !grupo || !fecha) {
         alert('Por favor, selecciona una Empresa, Grupo-Materia y Fecha.');
         return;
     }
 
-    // Construir el nombre del archivo
-    const fechaFormato = formatearFechaArchivo(fecha); // Formato: dic 16 de 2024
-    const nombreArchivo = `${empresa}-${grupo}-${fechaFormato}`;
+    // Formatea la fecha y construye el nombre del archivo
+    const fechaFormateada = formatearFecha(fecha);
+    const nombreArchivo = `${empresa}-${grupo}-${fechaFormateada}`;
+    console.log(`Buscando archivo: ${nombreArchivo}`); // Muestra el nombre del archivo en consola
 
     try {
-        const accessToken = await renovarAccessToken();
+        const accessToken = await renovarAccessToken(); // Renueva el token de acceso
         const archivo = await buscarArchivoEnDrive(nombreArchivo, accessToken);
 
         if (archivo) {
+            console.log(`Archivo encontrado: ${archivo.name} (ID: ${archivo.id})`);
             const contenido = await descargarContenidoArchivo(archivo.id, accessToken);
             mostrarTabla(contenido, fecha);
         } else {
             alert('No se encontró un archivo con ese nombre.');
+            console.warn('Archivo no encontrado.');
         }
     } catch (error) {
         console.error("Error:", error);
@@ -188,12 +192,17 @@ document.getElementById('visualizar').addEventListener('click', async () => {
 
 // Buscar archivo en Google Drive usando el Access Token
 async function buscarArchivoEnDrive(nombreArchivo, accessToken) {
-    const url = `https://www.googleapis.com/drive/v3/files?q="'${FOLDER_ID}' in parents and name='${nombreArchivo}'"&fields=files(id,name)"`;
+    const url = `https://www.googleapis.com/drive/v3/files?q="'${FOLDER_ID}' in parents and name='${nombreArchivo}'"&fields=files(id,name)`;
     const response = await fetch(url, {
         headers: {
             'Authorization': `Bearer ${accessToken}`
         }
     });
+
+    if (!response.ok) {
+        console.error('Error al buscar en Drive:', await response.text());
+        throw new Error('No se pudo realizar la búsqueda en Google Drive.');
+    }
 
     const data = await response.json();
     return data.files && data.files.length > 0 ? data.files[0] : null;
@@ -207,13 +216,19 @@ async function descargarContenidoArchivo(fileId, accessToken) {
             'Authorization': `Bearer ${accessToken}`
         }
     });
-    return await response.text(); // Se espera texto plano o CSV
+
+    if (!response.ok) {
+        console.error('Error al descargar el archivo:', await response.text());
+        throw new Error('No se pudo descargar el archivo.');
+    }
+
+    return await response.text(); // Asume que el archivo es texto plano o CSV
 }
 
 // Mostrar la tabla con los datos
 function mostrarTabla(contenido, fecha) {
-    const filas = contenido.trim().split('\n');
-    const datos = filas.map(fila => fila.split(','));
+    const filas = contenido.trim().split('\n'); // Divide el contenido por líneas
+    const datos = filas.map(fila => fila.split(',')); // Divide cada línea por comas
 
     const contenedor = document.createElement('div');
     contenedor.className = 'container mt-3';
@@ -242,16 +257,55 @@ function mostrarTabla(contenido, fecha) {
     document.body.appendChild(contenedor);
 }
 
-// Formatear fecha para el nombre del archivo
-function formatearFechaArchivo(fecha) {
-    const opciones = { day: '2-digit', month: 'short', year: 'numeric' };
-    return new Date(fecha).toLocaleDateString('es-ES', opciones).replace(/ /g, ' ');
+// Renueva el token de acceso
+async function renovarAccessToken() {
+    const clientId = '355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com';
+    const clientSecret = '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';
+    const refreshToken = '1//046SR2Bd895DvCgYIARAAGAQSNwF-L9IrjlTcWBE6ibiN0dIHd-AyC1LYzIs0dFG1UjUQ7fLSPFweb3_5-ViUgLsjgMdQwnc9vd0';
+
+    const body = new URLSearchParams({
+        client_id: clientId,
+        client_secret: clientSecret,
+        refresh_token: refreshToken,
+        grant_type: 'refresh_token'
+    });
+
+    try {
+        const response = await fetch('https://oauth2.googleapis.com/token', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/x-www-form-urlencoded'
+            },
+            body: body.toString()
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.access_token;
+        } else {
+            console.error('Error al renovar el token de acceso:', await response.text());
+            throw new Error('No se pudo renovar el token de acceso.');
+        }
+    } catch (error) {
+        console.error('Error al renovar el token:', error);
+        throw error;
+    }
 }
 
-// Formatear fecha para el título
-function formatearFechaVisual(fecha) {
-    const opciones = { day: '2-digit', month: 'long', year: 'numeric' };
-    return new Date(fecha).toLocaleDateString('es-ES', opciones);
+// Formatea la fecha para el nombre del archivo
+function formatearFecha(fechaInput) {
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const fecha = new Date(fechaInput);
+    const dia = fecha.getDate();
+    const mes = meses[fecha.getMonth()];
+    const anio = fecha.getFullYear();
+    return `${mes} ${dia} de ${anio}`;
+}
+
+// Formatea la fecha para visualización en la tabla
+function formatearFechaVisual(fechaInput) {
+    const fecha = new Date(fechaInput);
+    return fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 }
 
 
