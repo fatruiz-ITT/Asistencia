@@ -161,6 +161,47 @@ function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
     });
 }
 
+document.getElementById('guardar-lista').addEventListener('click', async () => {
+    const tabla = document.getElementById('tabla-alumnos');
+    const filas = tabla.querySelectorAll('tr');
+    const datos = [];
+
+    filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length > 0) {
+            const filaDatos = [];
+            celdas.forEach(celda => {
+                filaDatos.push(celda.textContent.trim()); // Extrae el texto de cada celda
+            });
+            datos.push(filaDatos); // Agrega la fila de datos
+        }
+    });
+
+    // URL del Web App de Google Apps Script
+    const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec'; // Reemplaza con la URL de tu Web App
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ datos: datos })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Datos guardados exitosamente');
+        } else {
+            alert('Hubo un problema al guardar los datos');
+        }
+    } catch (error) {
+        console.error('Error al enviar los datos:', error);
+        alert('Error al enviar los datos');
+    }
+});
+
+
 // Funciones de carga para los formularios de Visualizar, Eliminar e Imprimir
 async function cargarEmpresasVisualizar() {
     const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
