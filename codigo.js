@@ -6,10 +6,10 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
     filas.forEach(fila => {
         const celdas = fila.querySelectorAll('td');
         if (celdas.length > 0) {
-            const numeroEmpleado = celdas[0]?.textContent.value();
-            const nombreAlumno = celdas[1]?.textContent.value();
+            const numeroEmpleado = celdas[0]?.textContent;
+            const nombreAlumno = celdas[1]?.textContent;
             const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
-            const fechaAsistencia = celdas[3]?.textContent.value();
+            const fechaAsistencia = celdas[3]?.textContent;
 
             const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
             datos.push(filaDatos);
