@@ -345,7 +345,6 @@ function imprimirTabla(html) {
     ventanaImpresion.close();
 }
 
-
 // Renueva el token de acceso
 async function renovarAccessToken() {
     const clientId = '355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com';
