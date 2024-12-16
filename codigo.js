@@ -177,13 +177,13 @@ document.getElementById('visualizar').addEventListener('click', async () => {
         const archivo = await buscarArchivoEnDrive(nombreArchivo, accessToken);
 
         if (archivo) {
-            console.log(`Archivo encontrado: ${archivo.name} (ID: ${archivo.id})`);
-            const contenido = await descargarContenidoArchivo(archivo.id, accessToken);
-            mostrarTabla(contenido, fecha);
-        } else {
-            alert('No se encontró un archivo con ese nombre.');
-            console.warn('Archivo no encontrado.');
-        }
+      console.log(`Archivo encontrado: ${archivo.name} (ID: ${archivo.id})`);
+      const contenido = await descargarContenidoArchivo(archivo.id, accessToken);
+      mostrarTabla(contenido, fecha);
+  } else {
+      alert(`No se encontró un archivo con el nombre: ${nombreArchivo}. Por favor verifica los datos ingresados.`);
+      console.warn(`Archivo no encontrado: ${nombreArchivo}`);
+  }
     } catch (error) {
         console.error("Error:", error);
         alert('Ocurrió un error al buscar el archivo.');
