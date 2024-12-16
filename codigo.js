@@ -156,6 +156,93 @@ document.getElementById('btn-imprimir').addEventListener('click', () => {
     cargarEmpresasImprimir();
 });
 
+document.getElementById('visualizar').addEventListener('click', async () => {
+    const empresa = document.getElementById('materia-visualizar').value;
+    const grupo = document.getElementById('grupo-visualizar').value;
+    const fecha = document.getElementById('fecha-visualizar').value;
+
+    if (!empresa || !grupo || !fecha) {
+        alert('Por favor, selecciona una Empresa, Grupo-Materia y Fecha.');
+        return;
+    }
+
+    // URL del archivo que contiene los datos
+    const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
+    const response = await fetch(sheetURL);
+    const text = await response.text();
+    const json = JSON.parse(text.substring(47).slice(0, -2));
+
+    const data = json.table.rows;
+
+    // Filtrar los datos según los criterios seleccionados
+    const resultados = data
+        .map(row => ({
+            numeroEmpleado: row.c[0]?.v || '', // Columna A
+            nombre: row.c[1]?.v || '',         // Columna B
+            asistio: row.c[2]?.v || '',        // Columna C
+            empresa: row.c[4]?.v || ''         // Columna E
+        }))
+        .filter(item => item.empresa === empresa && grupo === grupo);
+
+    // Mostrar los resultados
+    mostrarTabla(resultados, fecha);
+});
+
+function mostrarTabla(datos, fecha) {
+    const contenedor = document.createElement('div');
+    contenedor.className = 'container mt-3';
+    contenedor.innerHTML = `
+        <h3 class="text-center">Lista del día ${formatearFecha(fecha)}</h3>
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Número de Empleado</th>
+                    <th>Nombre del Alumno</th>
+                    <th>Asistió</th>
+                    <th>Empresa</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${datos.map(d => `
+                    <tr>
+                        <td>${d.numeroEmpleado}</td>
+                        <td>${d.nombre}</td>
+                        <td>${d.asistio}</td>
+                        <td>${d.empresa}</td>
+                    </tr>`).join('')}
+            </tbody>
+        </table>
+    `;
+
+    // Mostrar el contenedor en un modal
+    const modal = document.createElement('div');
+    modal.className = 'modal fade';
+    modal.id = 'modalLista';
+    modal.tabIndex = '-1';
+    modal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Lista</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    ${contenedor.innerHTML}
+                </div>
+            </div>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+    const modalInstance = new bootstrap.Modal(document.getElementById('modalLista'));
+    modalInstance.show();
+}
+
+function formatearFecha(fecha) {
+    const opciones = { day: '2-digit', month: 'long', year: 'numeric' };
+    return new Date(fecha).toLocaleDateString('es-ES', opciones);
+}
+
 // Funciones de carga de datos desde Google Sheets
 async function cargarEmpresas() {
     const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
@@ -245,7 +332,6 @@ function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
 }
 
 // Funciones de carga para los formularios de Visualizar, Eliminar e Imprimir
-// Funciones de carga para los formularios de Visualizar, Eliminar e Imprimir
 async function cargarEmpresasVisualizar() {
     const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
     const response = await fetch(sheetURL);
@@ -292,8 +378,6 @@ async function cargarEmpresasVisualizar() {
 
 // Inicializar la carga de datos
 cargarEmpresasVisualizar();
-
-
 
 // Función para cargar empresas en el formulario de eliminación
 async function cargarEmpresasEliminar() {
