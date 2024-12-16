@@ -245,6 +245,7 @@ function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
 }
 
 // Funciones de carga para los formularios de Visualizar, Eliminar e Imprimir
+// Funciones de carga para los formularios de Visualizar, Eliminar e Imprimir
 async function cargarEmpresasVisualizar() {
     const sheetURL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
     const response = await fetch(sheetURL);
@@ -253,29 +254,20 @@ async function cargarEmpresasVisualizar() {
 
     const empresas = new Set();
     const grupos = {};
-    const fechas = {}; // Objeto para almacenar las fechas por grupo y materia
     const data = json.table.rows;
     const selectEmpresa = document.getElementById('materia-visualizar');
     selectEmpresa.innerHTML = '<option value="">Selecciona una opción</option>';
 
     data.forEach(row => {
         const empresa = row.c[4]?.v; // Columna E para Empresa
-        const grupo = row.c[3]?.v; // Columna D para Grupo
-        const fecha = row.c[5]?.v; // Columna F para Fecha (suponiendo que las fechas están en la columna F)
-
         if (empresa) {
             empresas.add(empresa);
-            if (!grupos[empresa]) {
+            const grupo = row.c[3]?.v; // Columna D para Grupo
+            if (grupo && !grupos[empresa]) {
                 grupos[empresa] = new Set();
             }
             if (grupo) {
                 grupos[empresa].add(grupo);
-                if (!fechas[`${empresa}-${grupo}`]) {
-                    fechas[`${empresa}-${grupo}`] = new Set();
-                }
-                if (fecha) {
-                    fechas[`${empresa}-${grupo}`].add(fecha);
-                }
             }
         }
     });
@@ -294,28 +286,13 @@ async function cargarEmpresasVisualizar() {
     document.getElementById('grupo-visualizar').addEventListener('change', () => {
         const materiaSeleccionada = selectEmpresa.value;
         const grupoSeleccionado = document.getElementById('grupo-visualizar').value;
-        cargarFechas(materiaSeleccionada, grupoSeleccionado, fechas);
+        // Aquí puedes agregar funcionalidad adicional si es necesario
     });
-}
-
-// Función para cargar las fechas disponibles en el calendario
-function cargarFechas(empresa, grupo, fechas) {
-    const selectFecha = document.getElementById('fecha-visualizar');
-    selectFecha.innerHTML = '<option value="">Selecciona la fecha a visualizar</option>';
-
-    const fechasDisponibles = fechas[`${empresa}-${grupo}`];
-    if (fechasDisponibles) {
-        fechasDisponibles.forEach(fecha => {
-            const option = document.createElement('option');
-            option.value = fecha;
-            option.textContent = fecha;
-            selectFecha.appendChild(option);
-        });
-    }
 }
 
 // Inicializar la carga de datos
 cargarEmpresasVisualizar();
+
 
 
 // Función para cargar empresas en el formulario de eliminación
