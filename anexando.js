@@ -51,3 +51,49 @@ document.getElementById('guardar-lista').addEventListener('click', async functio
     alert('Error de red: ' + error.message);
   }
 });
+
+
+document.getElementById('guardar-lista').addEventListener('click', async () => {
+    const tabla = document.getElementById('tabla-alumnos');
+    const filas = tabla.querySelectorAll('tbody tr');  // Cambié aquí
+    const datos = [];
+
+    filas.forEach(fila => {
+        const celdas = fila.querySelectorAll('td');
+        if (celdas.length > 0) {
+            // Recolectamos solo los 4 elementos que necesitas
+            const numeroEmpleado = celdas[0]?.textContent.value(); // Número de Empleado
+            const nombreAlumno = celdas[1]?.textContent.value();   // Nombre del Alumno
+            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No'; // Asistió?
+            const fechaAsistencia = celdas[3]?.textContent.value(); // Fecha de Asistencia
+
+            // Creamos una fila de datos con estos 4 elementos
+            const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
+            datos.push(filaDatos); // Agrega la fila de datos
+        }
+    });
+
+    // URL del Web App de Google Apps Script (reemplaza con la URL que copiaste)
+    const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec'; // Reemplaza con la URL de tu Web App
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ datos: datos })
+        });
+
+        const result = await response.json();
+        if (result.success) {
+            alert('Datos guardados exitosamente');
+        } else {
+            alert('Hubo un problema al guardar los datos');
+        }
+    } catch (error) {
+        console.error('Error al enviar los datos:', error);
+        alert('Error al enviar los datos');
+    }
+});
