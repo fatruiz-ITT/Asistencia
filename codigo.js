@@ -10,12 +10,9 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
             const nombreAlumno = celdas[1]?.textContent.trim();    // Obtener el texto del nombre del alumno
             const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';  // Obtener el valor del checkbox
             const fechaAsistencia = celdas[3]?.textContent.trim();  // Obtener la fecha de asistencia
+            const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
+            datos.push(filaDatos);
 
-            // Solo agregar datos si el número de empleado y nombre del alumno no están vacíos
-            if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
-                const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
-                datos.push(filaDatos);
-            }
         }
     });
 
