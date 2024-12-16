@@ -33,11 +33,12 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
 
     try {
         const response = await fetch(url, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            datos: [["14212338", "Kenia Perez Lopez Janeth", "Sí", "Sensata Otay"]],
+          }),
+        })
             body: JSON.stringify({ datos: datos })
         });
 
