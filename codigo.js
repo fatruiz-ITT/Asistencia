@@ -34,7 +34,7 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
     try {
         const response = await fetch(url, {
             method: 'POST',
-          //  mode: 'no-cors',
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json',
             },
