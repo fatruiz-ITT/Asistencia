@@ -4,6 +4,15 @@ async function guardarListaEnDrive() {
     const filas = tablaAlumnos.querySelectorAll('tr');
     const datos = [];
 
+    // Obtener los valores de los dropdowns y construir el título del archivo
+    const dropdownMateria = document.getElementById('dropdown-materia');
+    const dropdownGrupo = document.getElementById('dropdown-grupo');
+    const materia = dropdownMateria ? dropdownMateria.value.trim() : 'Materia';
+    const grupo = dropdownGrupo ? dropdownGrupo.value.trim() : 'Grupo';
+    const fecha = new Date();
+    const fechaFormateada = `${fecha.toLocaleString('es-ES', { month: 'short' })} ${fecha.getDate()} de ${fecha.getFullYear()}`;
+    const nombreArchivo = `${materia}-${grupo}-${fechaFormateada}.txt`;
+
     // Recopilar datos de la tabla
     filas.forEach(fila => {
         const celdas = fila.querySelectorAll('td');
@@ -22,7 +31,7 @@ async function guardarListaEnDrive() {
     // Subir el archivo a Google Drive
     const accessToken = 'ya29.a0ARW5m77MbH39wX_MStDTThWWe0IUtl8yb4dHbMF3gXQINtB-z9E2kjeuT8nuKnRNt1eFaF4_ooEnnIXVZVXZLKC6iew6KE-2rC--Vw-2L-3InIcb8Gj8aYkHQ7U2ZDPRw4_hW9x63K8WZwE0UzHDFN9s--4DKQPg5O6S6rK2aCgYKAXkSARESFQHGX2MiNlwgJe_VJHHJITvQoLRHoQ0175'; // Reemplaza con tu token de acceso válido
     const fileMetadata = {
-        name: `lista_alumnos_${new Date().toISOString()}.txt`,
+        name: nombreArchivo,
         mimeType: 'application/vnd.google-apps.file',
         parents: ['1HO_fZ_kqtEgyD9dWLcFnFA_nRd8UenkU'] // ID de la carpeta en Drive
     };
@@ -58,6 +67,7 @@ const botonGuardar = document.getElementById('guardar-lista');
 if (botonGuardar) {
     botonGuardar.addEventListener('click', guardarListaEnDrive);
 }
+
 
 // Funciones de manejo de eventos
 document.getElementById('btn-anexar').addEventListener('click', () => {
