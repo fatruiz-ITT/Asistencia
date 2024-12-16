@@ -255,7 +255,6 @@ async function descargarContenidoArchivo(fileId, accessToken) {
 }
 
 // Mostrar la tabla con los datos
-// Mostrar la tabla con los datos
 function mostrarTabla(contenido, fecha) {
     // Elimina cualquier tabla anterior existente
     const tablaExistente = document.getElementById('tabla-contenedor');
@@ -294,18 +293,44 @@ function mostrarTabla(contenido, fecha) {
             </tbody>
         </table>
         <div class="text-center mt-3">
-            <button class="btn btn-primary" id="btn-imprimir">
-                <i class="fas fa-print"></i> Imprimir
-            </button>
-        </div>
+           <button class="btn btn-primary" id="btn-imprimir">
+               <i class="fas fa-print"></i> Imprimir
+           </button>
+       </div><p>
     `;
 
     // Añadir el contenedor al cuerpo del documento
     document.body.appendChild(contenedor);
 }
 
-// Función para imprimir la tabla
-function imprimirTabla(html) {
+// Función para imprimir el contenido
+function imprimirTabla(contenido, fecha) {
+    const filas = contenido.trim().split('\n');
+    const datos = filas.map(fila => fila.split(','));
+
+    const html = `
+        <h3 class="text-center">Lista del día ${formatearFechaVisual(fecha)}</h3>
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Número de Empleado</th>
+                    <th>Nombre del Alumno</th>
+                    <th>Asistió</th>
+                    <th>Empresa</th>
+                </tr>
+            </thead>
+            <tbody>
+                ${datos.map(d => `
+                    <tr>
+                        <td>${d[0]}</td>
+                        <td>${d[1]}</td>
+                        <td>${d[2]}</td>
+                        <td>${d[3]}</td>
+                    </tr>`).join('')}
+            </tbody>
+        </table>
+    `;
+
     const ventanaImpresion = window.open('', '_blank', 'width=800,height=600');
     ventanaImpresion.document.open();
     ventanaImpresion.document.write(`
@@ -342,7 +367,6 @@ function imprimirTabla(html) {
     ventanaImpresion.print();
     ventanaImpresion.close();
 }
-
 // Renueva el token de acceso
 async function renovarAccessToken() {
     const clientId = '355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com';
