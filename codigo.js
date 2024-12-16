@@ -254,11 +254,18 @@ async function descargarContenidoArchivo(fileId, accessToken) {
 // Mostrar la tabla con los datos
 // Mostrar la tabla con los datos
 function mostrarTabla(contenido, fecha) {
+    // Elimina cualquier tabla anterior existente
+    const tablaExistente = document.getElementById('tabla-contenedor');
+    if (tablaExistente) {
+        tablaExistente.remove();
+    }
+
     const filas = contenido.trim().split('\n'); // Divide el contenido por líneas
     const datos = filas.map(fila => fila.split(',')); // Divide cada línea por comas
 
-    // Crear contenedor principal
+    // Crear contenedor principal para la tabla
     const contenedor = document.createElement('div');
+    contenedor.id = 'tabla-contenedor'; // Añade un ID único para identificar este contenedor
     contenedor.className = 'container mt-3';
 
     // Contenido HTML para la tabla y el botón de imprimir
