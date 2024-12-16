@@ -1,18 +1,21 @@
 document.getElementById('guardar-lista').addEventListener('click', async () => {
     const tabla = document.getElementById('tabla-alumnos');
-    const filas = tabla.querySelectorAll('tbody tr');
+    const filas = tabla.querySelectorAll('tr');  // Asegúrate de seleccionar las filas correctamente
     const datos = [];
 
     filas.forEach(fila => {
         const celdas = fila.querySelectorAll('td');
         if (celdas.length > 0) {
-            const numeroEmpleado = celdas[0]?.textContent;
-            const nombreAlumno = celdas[1]?.textContent;
-          //  const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
-            const fechaAsistencia = celdas[3]?.textContent;
+            const numeroEmpleado = celdas[0]?.textContent.trim();  // Obtener el texto del número de empleado
+            const nombreAlumno = celdas[1]?.textContent.trim();    // Obtener el texto del nombre del alumno
+            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';  // Obtener el valor del checkbox
+            const fechaAsistencia = celdas[3]?.textContent.trim();  // Obtener la fecha de asistencia
 
-            const filaDatos = [numeroEmpleado, nombreAlumno, fechaAsistencia];
-            datos.push(filaDatos);
+            // Solo agregar datos si el número de empleado y nombre del alumno no están vacíos
+            if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
+                const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
+                datos.push(filaDatos);
+            }
         }
     });
 
@@ -39,8 +42,6 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
         alert('Error al enviar los datos');
     }
 });
-
-
 
 
 // Funciones de manejo de eventos
