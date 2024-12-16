@@ -8,7 +8,7 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
         if (celdas.length > 0) {
             const numeroEmpleado = celdas[0]?.textContent;
             const nombreAlumno = celdas[1]?.textContent;
-            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
+          //  const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
             const fechaAsistencia = celdas[3]?.textContent;
 
             const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
