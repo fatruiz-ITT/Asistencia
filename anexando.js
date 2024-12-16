@@ -31,6 +31,7 @@ document.getElementById('guardar-lista').addEventListener('click', async functio
     const response = await fetch('https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exe',
     {
       method: 'POST',
+      mode: 'no-cors',
       body: JSON.stringify(alumnos),
       headers: {
         'Content-Type': 'application/json'
