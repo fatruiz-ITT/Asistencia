@@ -1,34 +1,49 @@
 document.getElementById('guardar-lista').addEventListener('click', async () => {
     const tabla = document.getElementById('tabla-alumnos');
-    const filas = tabla.querySelectorAll('tr');  // Asegúrate de seleccionar las filas correctamente
+    const filas = tabla.querySelectorAll('tr');
     const datos = [];
+
+    // Verificar si hay filas en la tabla
+    console.log(`Filas encontradas: ${filas.length}`);
 
     filas.forEach(fila => {
         const celdas = fila.querySelectorAll('td');
         if (celdas.length > 0) {
-            const numeroEmpleado = celdas[0]?.textContent.trim();  // Obtener el texto del número de empleado
-            const nombreAlumno = celdas[1]?.textContent.trim();    // Obtener el texto del nombre del alumno
-            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';  // Obtener el valor del checkbox
-            const fechaAsistencia = celdas[3]?.textContent.trim();  // Obtener la fecha de asistencia
-            const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
-            datos.push(filaDatos);
+            const numeroEmpleado = celdas[0]?.textContent.trim();
+            const nombreAlumno = celdas[1]?.textContent.trim();
+            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
+            const fechaAsistencia = celdas[3]?.textContent.trim();
 
+            // Verificar si los datos no están vacíos
+            if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
+                const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
+                datos.push(filaDatos);
+            }
         }
     });
+
+    console.log("Datos a guardar:", datos);
+
+    if (datos.length === 0) {
+        alert('No hay datos para guardar');
+        return;
+    }
 
     const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec';
 
     try {
         const response = await fetch(url, {
             method: 'POST',
-            mode: 'no-cors',  // Modo no-cors mantiene la política CORS del navegador
+            mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ datos: datos })
         });
 
-        // Verificamos el estado de la respuesta sin intentar convertirla a JSON
+        // Verificar el estado de la respuesta
+        console.log("Respuesta del servidor:", response);
+
         if (response.ok) {
             alert('Datos guardados exitosamente');
         } else {
