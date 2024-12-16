@@ -39,8 +39,6 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
             datos: [["14212338", "Kenia Perez Lopez Janeth", "Sí", "Sensata Otay"]],
           }),
         })
-            body: JSON.stringify({ datos: datos })
-        });
 
         // Verificar el estado de la respuesta
         console.log("Respuesta del servidor:", response);
