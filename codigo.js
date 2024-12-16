@@ -1,38 +1,35 @@
 document.getElementById('guardar-lista').addEventListener('click', async () => {
     const tabla = document.getElementById('tabla-alumnos');
-    const filas = tabla.querySelectorAll('tbody tr');  // Cambié aquí
+    const filas = tabla.querySelectorAll('tbody tr');
     const datos = [];
 
     filas.forEach(fila => {
         const celdas = fila.querySelectorAll('td');
         if (celdas.length > 0) {
-            // Recolectamos solo los 4 elementos que necesitas
-            const numeroEmpleado = celdas[0]?.textContent.trim(); // Número de Empleado
-            const nombreAlumno = celdas[1]?.textContent.trim();   // Nombre del Alumno
-            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No'; // Asistió?
-            const fechaAsistencia = celdas[3]?.textContent.trim(); // Fecha de Asistencia
+            const numeroEmpleado = celdas[0]?.textContent.trim();
+            const nombreAlumno = celdas[1]?.textContent.trim();
+            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
+            const fechaAsistencia = celdas[3]?.textContent.trim();
 
-            // Creamos una fila de datos con estos 4 elementos
             const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
-            datos.push(filaDatos); // Agrega la fila de datos
+            datos.push(filaDatos);
         }
     });
 
-    // URL del Web App de Google Apps Script (reemplaza con la URL que copiaste)
-    const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec'; // Reemplaza con la URL de tu Web App
+    const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec';
 
     try {
         const response = await fetch(url, {
             method: 'POST',
-            mode: 'no-cors',
+            mode: 'no-cors',  // Modo no-cors mantiene la política CORS del navegador
             headers: {
                 'Content-Type': 'application/json',
             },
             body: JSON.stringify({ datos: datos })
         });
 
-        const result = await response.json();
-        if (result.success) {
+        // Verificamos el estado de la respuesta sin intentar convertirla a JSON
+        if (response.ok) {
             alert('Datos guardados exitosamente');
         } else {
             alert('Hubo un problema al guardar los datos');
