@@ -1,3 +1,33 @@
+document.addEventListener("DOMContentLoaded", function() {
+    // Función para obtener la fecha actual en formato dd-mm-yyyy
+    function obtenerFechaActual() {
+        const fecha = new Date();
+        const dia = String(fecha.getDate()).padStart(2, '0');
+        const mes = String(fecha.getMonth() + 1).padStart(2, '0'); // Los meses empiezan desde 0
+        const anio = fecha.getFullYear();
+        return `${dia}-${mes}-${anio}`;
+    }
+
+    // Función para colocar la fecha actual en las filas de la tabla de asistencia
+    function colocarFechaAsistencia() {
+        const filas = document.querySelectorAll("#tabla-alumnos tr"); // Seleccionamos las filas de la tabla
+        const fechaActual = obtenerFechaActual();
+
+        filas.forEach(fila => {
+            // Selecciona la celda correspondiente a la "Fecha de Asistencia"
+            const celdaFecha = fila.querySelector("td:nth-child(4)");
+            if (celdaFecha && !celdaFecha.textContent) {
+                // Coloca la fecha actual en la celda, solo si está vacía
+                celdaFecha.textContent = fechaActual;
+            }
+        });
+    }
+
+    // Llamamos a la función para actualizar la fecha cuando la página se carga
+    colocarFechaAsistencia();
+});
+
+
 // Funciones de manejo de eventos
 document.getElementById('btn-anexar').addEventListener('click', () => {
     document.getElementById('form-anexar').style.display = 'block';
