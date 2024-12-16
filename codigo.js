@@ -155,7 +155,7 @@ function cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado) {
             <td>${alumno}</td>
             <td>${nombre}</td>
             <td style="display: flex; align-items: center; justify-content: center;"><input type="checkbox" ${asistio === 'Sí' ? 'checked' : ''}></td>
-            <td>${materiaSeleccionada}</td>
+            <td>${colocarFechaAsistencia}</td>
         `;
         tablaAlumnos.appendChild(tr);
     });
