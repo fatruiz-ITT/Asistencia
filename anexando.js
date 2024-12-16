@@ -62,10 +62,10 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
         const celdas = fila.querySelectorAll('td');
         if (celdas.length > 0) {
             // Recolectamos solo los 4 elementos que necesitas
-            const numeroEmpleado = celdas[0]?.textContent.value(); // Número de Empleado
-            const nombreAlumno = celdas[1]?.textContent.value();   // Nombre del Alumno
+            const numeroEmpleado = celdas[0]?.textContent.trim(); // Número de Empleado
+            const nombreAlumno = celdas[1]?.textContent.trim();   // Nombre del Alumno
             const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No'; // Asistió?
-            const fechaAsistencia = celdas[3]?.textContent.value(); // Fecha de Asistencia
+            const fechaAsistencia = celdas[3]?.textContent.trim(); // Fecha de Asistencia
 
             // Creamos una fila de datos con estos 4 elementos
             const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
