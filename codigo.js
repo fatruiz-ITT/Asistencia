@@ -116,6 +116,7 @@ document.getElementById('btn-anexar').addEventListener('click', () => {
     document.getElementById('form-visualizar-lista').style.display = 'none';
     document.getElementById('form-eliminar-lista').style.display = 'none';
     document.getElementById('form-imprimir-lista').style.display = 'none';
+    document.getElementById('tabla-contenedor').style.display = 'none';
 });
 
 document.getElementById('btn-pasar-lista').addEventListener('click', () => {
@@ -124,6 +125,7 @@ document.getElementById('btn-pasar-lista').addEventListener('click', () => {
     document.getElementById('form-visualizar-lista').style.display = 'none';
     document.getElementById('form-eliminar-lista').style.display = 'none';
     document.getElementById('form-imprimir-lista').style.display = 'none';
+    document.getElementById('tabla-contenedor').style.display = 'none';
     cargarEmpresas(); // Cargar empresas y grupos
 });
 
@@ -142,6 +144,7 @@ document.getElementById('btn-borrar').addEventListener('click', () => {
     document.getElementById('form-visualizar-lista').style.display = 'none';
     document.getElementById('form-eliminar-lista').style.display = 'block';
     document.getElementById('form-imprimir-lista').style.display = 'none';
+    document.getElementById('tabla-contenedor').style.display = 'none';
     cargarEmpresasEliminar();
 });
 
