@@ -20,7 +20,7 @@ async function guardarListaEnDrive() {
     const contenido = datos.join('\n');
 
     // Subir el archivo a Google Drive
-    const accessToken = 'https://accounts.google.com/o/oauth2/v2/auth?client_id=355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com&redirect_uri=https://fatruiz-itt.github.io/Asistencia/&response_type=code&scope=https://www.googleapis.com/auth/drive.file&access_type=offline'; // Reemplaza con tu token de acceso válido
+    const accessToken = 'ya29.a0ARW5m77MbH39wX_MStDTThWWe0IUtl8yb4dHbMF3gXQINtB-z9E2kjeuT8nuKnRNt1eFaF4_ooEnnIXVZVXZLKC6iew6KE-2rC--Vw-2L-3InIcb8Gj8aYkHQ7U2ZDPRw4_hW9x63K8WZwE0UzHDFN9s--4DKQPg5O6S6rK2aCgYKAXkSARESFQHGX2MiNlwgJe_VJHHJITvQoLRHoQ0175'; // Reemplaza con tu token de acceso válido
     const fileMetadata = {
         name: `lista_alumnos_${new Date().toISOString()}.txt`,
         mimeType: 'application/vnd.google-apps.file',
