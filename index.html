@@ -100,6 +100,31 @@
                     <option value="">Selecciona una opción</option>
                 </select>
             </div>
+            <script>
+                document.addEventListener("DOMContentLoaded", function() {
+                    function obtenerFechaActual() {
+                        const fecha = new Date();
+                        const dia = String(fecha.getDate()).padStart(2, '0');
+                        const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+                        const anio = fecha.getFullYear();
+                        return `${dia}-${mes}-${anio}`;
+                    }
+
+                    function colocarFechaAsistencia() {
+                        const filas = document.querySelectorAll("#tabla-alumnos tr");
+                        const fechaActual = obtenerFechaActual();
+
+                        filas.forEach(fila => {
+                            const celdaFecha = fila.querySelector("td:nth-child(4)");
+                            if (celdaFecha) {
+                                celdaFecha.textContent = fechaActual;
+                            }
+                        });
+                    }
+
+                    colocarFechaAsistencia();
+                });
+            </script>
 
             <div class="table-responsive">
                 <table class="table table-bordered table-striped">
