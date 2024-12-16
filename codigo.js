@@ -299,11 +299,6 @@ function mostrarTabla(contenido, fecha) {
 
     // Añadir el contenedor al cuerpo del documento
     document.body.appendChild(contenedor);
-
-    // Agregar evento al botón de imprimir
-    document.getElementById('btn-imprimir').addEventListener('click', () => {
-        imprimirTabla(contenedor.innerHTML);
-    });
 }
 
 // Función para imprimir la tabla
