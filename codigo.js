@@ -11,7 +11,7 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
           //  const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
             const fechaAsistencia = celdas[3]?.textContent;
 
-            const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
+            const filaDatos = [numeroEmpleado, nombreAlumno, fechaAsistencia];
             datos.push(filaDatos);
         }
     });
