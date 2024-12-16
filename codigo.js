@@ -192,20 +192,28 @@ document.getElementById('visualizar').addEventListener('click', async () => {
 
 // Buscar archivo en Google Drive usando el Access Token
 async function buscarArchivoEnDrive(nombreArchivo, accessToken) {
-    const url = `https://www.googleapis.com/drive/v3/files?q="'${FOLDER_ID}' in parents and name='${nombreArchivo}'"&fields=files(id,name)`;
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
+  const query = encodeURIComponent(`'${FOLDER_ID}' in parents and name='${nombreArchivo}'`);
+  const url = `https://www.googleapis.com/drive/v3/files?q=${query}&fields=files(id,name)`;
+  console.log("URL completa de la petición:", url); // Muestra la URL en consola
 
-    if (!response.ok) {
-        console.error('Error al buscar en Drive:', await response.text());
-        throw new Error('No se pudo realizar la búsqueda en Google Drive.');
-    }
+  try {
+      const response = await fetch(url, {
+          headers: {
+              'Authorization': `Bearer ${accessToken}`
+          }
+      });
 
-    const data = await response.json();
-    return data.files && data.files.length > 0 ? data.files[0] : null;
+      if (!response.ok) {
+          console.error('Error al buscar en Drive:', await response.text());
+          throw new Error('No se pudo realizar la búsqueda en Google Drive.');
+      }
+
+      const data = await response.json();
+      return data.files && data.files.length > 0 ? data.files[0] : null;
+  } catch (error) {
+      console.error("Error en buscarArchivoEnDrive:", error);
+      throw error;
+  }
 }
 
 // Descargar el contenido del archivo
