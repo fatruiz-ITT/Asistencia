@@ -295,12 +295,17 @@ async function renovarAccessToken() {
 // Formatea la fecha para el nombre del archivo
 function formatearFecha(fechaInput) {
     const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
-    const fecha = new Date(fechaInput);
-    const dia = fecha.getDate();
-    const mes = meses[fecha.getMonth()];
-    const anio = fecha.getFullYear();
-    return `${mes} ${dia} de ${anio}`;
+
+    // Crear una fecha en la zona horaria local (sin ajustes UTC)
+    const [anio, mes, dia] = fechaInput.split('-');
+    const fecha = new Date(anio, mes - 1, dia); // mes es 0-based en JS
+
+    const diaLocal = fecha.getDate();
+    const mesLocal = meses[fecha.getMonth()];
+    const anioLocal = fecha.getFullYear();
+    return `${mesLocal} ${diaLocal} de ${anioLocal}`;
 }
+
 
 // Formatea la fecha para visualización en la tabla
 function formatearFechaVisual(fechaInput) {
