@@ -1,6 +1,6 @@
 document.getElementById('guardar-lista').addEventListener('click', async () => {
     const tabla = document.getElementById('tabla-alumnos');
-    const filas = tabla.querySelectorAll('tr');
+    const filas = tabla.querySelectorAll('tbody tr');  // Cambié aquí
     const datos = [];
 
     filas.forEach(fila => {
@@ -42,6 +42,7 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
         alert('Error al enviar los datos');
     }
 });
+
 
 
 
