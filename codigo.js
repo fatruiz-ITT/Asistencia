@@ -219,18 +219,36 @@ async function buscarArchivoEnDrive(nombreArchivo, accessToken) {
 // Descargar el contenido del archivo
 async function descargarContenidoArchivo(fileId, accessToken) {
     const url = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
-    const response = await fetch(url, {
-        headers: {
-            'Authorization': `Bearer ${accessToken}`
-        }
-    });
+    const exportUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=text/plain`;
 
-    if (!response.ok) {
-        console.error('Error al descargar el archivo:', await response.text());
+    try {
+        // Intentar descarga directa
+        let response = await fetch(url, {
+            headers: {
+                'Authorization': `Bearer ${accessToken}`
+            }
+        });
+
+        // Si la descarga directa falla, intentar exportación
+        if (!response.ok) {
+            console.warn('Intentando exportar el archivo como texto...');
+            response = await fetch(exportUrl, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`
+                }
+            });
+
+            if (!response.ok) {
+                console.error('Error al exportar el archivo:', await response.text());
+                throw new Error('No se pudo exportar el archivo.');
+            }
+        }
+
+        return await response.text(); // Retorna el contenido exportado o descargado
+    } catch (error) {
+        console.error('Error al descargar el archivo:', error);
         throw new Error('No se pudo descargar el archivo.');
     }
-
-    return await response.text(); // Asume que el archivo es texto plano o CSV
 }
 
 // Mostrar la tabla con los datos
