@@ -1,55 +1,74 @@
-document.getElementById('guardar-lista').addEventListener('click', async () => {
-    const tabla = document.getElementById('tabla-alumnos');
-    const filas = tabla.querySelectorAll('tr');
-    const datos = [];
+// Cargar la API de Google y autenticar al usuario
+function gapiInit() {
+    gapi.load('client:auth2', async () => {
+        await gapi.client.init({
+            apiKey: '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', // Reemplaza con tu API Key
+            clientId: '355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com', // Reemplaza con tu Client ID
+            discoveryDocs: ["https://www.googleapis.com/discovery/v1/apis/drive/v3/rest"],
+            scope: 'https://www.googleapis.com/auth/drive.file'
+        });
+    });
+}
 
-    filas.forEach(fila => {
-      const celdas = fila.querySelectorAll('td');
-      if (celdas.length > 0) {
-        const numeroEmpleado = celdas[0]?.textContent.trim();
-        const nombreAlumno = celdas[1]?.textContent.trim();
-        const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
-        const fechaAsistencia = celdas[3]?.textContent.trim();
+// Función para autenticar al usuario
+async function authenticateUser() {
+    await gapi.auth2.getAuthInstance().signIn();
+}
 
-        if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
-          datos.push([numeroEmpleado, nombreAlumno, asistio, fechaAsistencia]);
-        }
-      }
+// Función para guardar los datos de la tabla en un archivo de texto
+async function guardarLista() {
+    const tablaAlumnos = document.getElementById('tabla-alumnos');
+    let contenido = '';
+
+    // Recorrer las filas de la tabla y construir el contenido
+    Array.from(tablaAlumnos.rows).forEach(row => {
+        const alumno = row.cells[0].textContent;
+        const nombre = row.cells[1].textContent;
+        const asistio = row.cells[2].querySelector('input').checked ? 'Sí' : 'No';
+        const materia = row.cells[3].textContent;
+
+        contenido += `${alumno}, ${nombre}, ${asistio}, ${materia}\n`;
     });
 
-    console.log("Datos enviados:", datos);
+    // Crear el archivo
+    const fileContent = new Blob([contenido], { type: 'text/plain' });
+    const metadata = {
+        name: 'lista_alumnos.txt',
+        parents: ['1HO_fZ_kqtEgyD9dWLcFnFA_nRd8UenkU'], // ID de la carpeta
+    };
 
-    if (datos.length === 0) {
-      alert('No hay datos para guardar');
-      return;
-    }
+    const form = new FormData();
+    form.append('metadata', new Blob([JSON.stringify(metadata)], { type: 'application/json' }));
+    form.append('file', fileContent);
 
-    const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec';
-
-    try {
-      const response = await fetch(url, {
+    // Subir el archivo a Google Drive
+    const accessToken = gapi.auth.getToken().access_token;
+    const response = await fetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart', {
         method: 'POST',
-        mode: 'no-cors',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ datos }),
-      });
+        headers: new Headers({ 'Authorization': `Bearer ${accessToken}` }),
+        body: form
+    });
 
-      // Si el servidor responde con un JSON
-      if (response.ok) {
-        const responseData = await response.json();
-        console.log('Respuesta del servidor:', responseData);
-        alert('Datos guardados exitosamente');
-      } else {
-        console.error('Error en la respuesta:', response.status, response.statusText);
-        alert('Hubo un problema al guardar los datos');
-      }
-    } catch (error) {
-      console.error('Error al enviar los datos:', error);
-      alert('Error al enviar los datos');
+    if (response.ok) {
+        alert('Lista guardada exitosamente en Google Drive.');
+    } else {
+        console.error('Error al guardar el archivo:', await response.text());
+        alert('Hubo un error al guardar la lista.');
     }
-  });
+}
+
+// Agregar el evento al botón "guardar-lista"
+document.getElementById('guardar-lista').addEventListener('click', async () => {
+    try {
+        await authenticateUser();
+        await guardarLista();
+    } catch (error) {
+        console.error('Error durante el proceso de autenticación o guardado:', error);
+    }
+});
+
+// Inicializar la API de Google
+gapiInit();
 
 
 // Funciones de manejo de eventos
