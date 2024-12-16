@@ -3,56 +3,53 @@ document.getElementById('guardar-lista').addEventListener('click', async () => {
     const filas = tabla.querySelectorAll('tr');
     const datos = [];
 
-    // Verificar si hay filas en la tabla
-    console.log(`Filas encontradas: ${filas.length}`);
-
     filas.forEach(fila => {
-        const celdas = fila.querySelectorAll('td');
-        if (celdas.length > 0) {
-            const numeroEmpleado = celdas[0]?.textContent.trim();
-            const nombreAlumno = celdas[1]?.textContent.trim();
-            const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
-            const fechaAsistencia = celdas[3]?.textContent.trim();
+      const celdas = fila.querySelectorAll('td');
+      if (celdas.length > 0) {
+        const numeroEmpleado = celdas[0]?.textContent.trim();
+        const nombreAlumno = celdas[1]?.textContent.trim();
+        const asistio = celdas[2]?.querySelector('input')?.checked ? 'Sí' : 'No';
+        const fechaAsistencia = celdas[3]?.textContent.trim();
 
-            // Verificar si los datos no están vacíos
-            if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
-                const filaDatos = [numeroEmpleado, nombreAlumno, asistio, fechaAsistencia];
-                datos.push(filaDatos);
-            }
+        if (numeroEmpleado && nombreAlumno && fechaAsistencia) {
+          datos.push([numeroEmpleado, nombreAlumno, asistio, fechaAsistencia]);
         }
+      }
     });
 
-    console.log("Datos a guardar:", datos);
+    console.log("Datos enviados:", datos);
 
     if (datos.length === 0) {
-        alert('No hay datos para guardar');
-        return;
+      alert('No hay datos para guardar');
+      return;
     }
 
     const url = 'https://script.google.com/macros/s/AKfycbyjV7WkJHbX9-hBtmGbkqiS9x0LhzmCCHxoU7y5hZZoRPvfjkqO0nyKu0h7z9QaS_tUHw/exec';
 
     try {
-        const response = await fetch(url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            datos: [["14212338", "Kenia Perez Lopez Janeth", "Sí", "Sensata Otay"]],
-          }),
-        })
+      const response = await fetch(url, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ datos }),
+      });
 
-        // Verificar el estado de la respuesta
-        console.log("Respuesta del servidor:", response);
-
-        if (response.ok) {
-            alert('Datos guardados exitosamente');
-        } else {
-            alert('Hubo un problema al guardar los datos');
-        }
+      // Si el servidor responde con un JSON
+      if (response.ok) {
+        const responseData = await response.json();
+        console.log('Respuesta del servidor:', responseData);
+        alert('Datos guardados exitosamente');
+      } else {
+        console.error('Error en la respuesta:', response.status, response.statusText);
+        alert('Hubo un problema al guardar los datos');
+      }
     } catch (error) {
-        console.error('Error al enviar los datos:', error);
-        alert('Error al enviar los datos');
+      console.error('Error al enviar los datos:', error);
+      alert('Error al enviar los datos');
     }
-});
+  });
 
 
 // Funciones de manejo de eventos
