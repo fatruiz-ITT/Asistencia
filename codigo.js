@@ -5,8 +5,8 @@ async function guardarListaEnDrive() {
     const datos = [];
 
     // Obtener los valores de los dropdowns y construir el título del archivo
-    const dropdownMateria = document.getElementById('dropdown-materia');
-    const dropdownGrupo = document.getElementById('dropdown-grupo');
+    const dropdownMateria = document.getElementById('materia');
+    const dropdownGrupo = document.getElementById('grupo');
     const materia = dropdownMateria ? dropdownMateria.value.trim() : 'Materia';
     const grupo = dropdownGrupo ? dropdownGrupo.value.trim() : 'Grupo';
     const fecha = new Date();
