@@ -659,8 +659,8 @@ async function obtenerDatosGoogleSheets() {
 
             // Mapear las filas del JSON a un formato más usable
             datosOriginales = jsonData.table.rows.map(row => ({
-                Empresa: row.c[0]?.v || '',  // Columna A
-                Grupo: row.c[1]?.v || '',    // Columna B
+                Empresa: row.c[3]?.v || '',  // Columna A
+                Grupo: row.c[4]?.v || '',    // Columna B
                 B: row.c[1]?.v || '',        // Columna B (repitiendo por simplicidad)
                 C: row.c[2]?.v || '',        // Columna C
                 D: row.c[3]?.v || '',        // Columna D
