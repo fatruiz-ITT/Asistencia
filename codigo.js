@@ -425,7 +425,7 @@ function imprimirTabla() {
                     body { font-family: Arial, sans-serif; margin: 20px; color: #000; }
                     h3 { text-align: center; margin-bottom: 20px; }
                     .table { width: 100%; border-collapse: collapse; }
-                    .table th, .table td { border: 2px solid #000; padding: 9px; text-align: center; }
+                    .table th, .table td { border: 1px solid #000; padding: 8px; text-align: left; }
                     .table thead { background-color: #000; color: #fff; }
                     @media print {
                         body { margin: 0; }
