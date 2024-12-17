@@ -298,70 +298,7 @@ function mostrarTabla(contenido, fecha) {
     document.body.appendChild(contenedor);
 }
 
-// Función para imprimir el contenido
-function imprimirTabla(contenido, fecha) {
-    const filas = contenido.trim().split('\n');
-    const datos = filas.map(fila => fila.split(','));
 
-    const html = `
-        <h3 class="text-center">Lista del día ${formatearFechaVisual(fecha)}</h3>
-        <table class="table table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Número de Empleado</th>
-                    <th>Nombre del Alumno</th>
-                    <th>Asistió</th>
-                    <th>Empresa</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${datos.map(d => `
-                    <tr>
-                        <td>${d[0]}</td>
-                        <td>${d[1]}</td>
-                        <td>${d[2]}</td>
-                        <td>${d[3]}</td>
-                    </tr>`).join('')}
-            </tbody>
-        </table>
-    `;
-
-    const ventanaImpresion = window.open('', '_blank', 'width=800,height=600');
-    ventanaImpresion.document.open();
-    ventanaImpresion.document.write(`
-        <html>
-            <head>
-                <title>Imprimir Lista</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        margin: 20px;
-                    }
-                    .table {
-                        width: 100%;
-                        border-collapse: collapse;
-                    }
-                    .table th, .table td {
-                        border: 1px solid #000;
-                        padding: 8px;
-                        text-align: left;
-                    }
-                    .table thead {
-                        background-color: #343a40;
-                        color: #fff;
-                    }
-                </style>
-            </head>
-            <body>
-                ${html}
-            </body>
-        </html>
-    `);
-    ventanaImpresion.document.close();
-    ventanaImpresion.focus();
-    ventanaImpresion.print();
-    ventanaImpresion.close();
-}
 // Renueva el token de acceso
 async function renovarAccessToken() {
     const clientId = '355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com';
@@ -418,7 +355,6 @@ function formatearFechaVisual(fechaInput) {
     const fecha = new Date(anio, mes - 1, dia); // Crear la fecha correctamente (meses empiezan en 0)
     return fecha.toLocaleDateString('es-ES', { year: 'numeric', month: 'long', day: 'numeric' });
 }
-
 
 
 // Funciones de carga de datos desde Google Sheets
