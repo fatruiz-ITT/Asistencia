@@ -654,22 +654,24 @@ async function obtenerDatosGoogleSheets() {
     try {
         const response = await fetch(url);
         const text = await response.text();
-        const json = JSON.parse(text.substring(47).slice(0, -2));
+        // Extraer solo el contenido JSON válido de la respuesta
+            const jsonData = JSON.parse(text.substring(47).slice(0, -2));
 
-        // Mapear los datos de las columnas
-        datosOriginales = json.table.rows.map(row => ({
-            Empresa: row.c[0]?.v || '',
-            Grupo: row.c[1]?.v || '',
-            B: row.c[1]?.v || '',
-            C: row.c[2]?.v || '',
-            D: row.c[3]?.v || '',
-            E: row.c[4]?.v || ''
-        }));
+            // Mapear las filas del JSON a un formato más usable
+            datosOriginales = jsonData.table.rows.map(row => ({
+                Empresa: row.c[0]?.v || '',  // Columna A
+                Grupo: row.c[1]?.v || '',    // Columna B
+                B: row.c[1]?.v || '',        // Columna B (repitiendo por simplicidad)
+                C: row.c[2]?.v || '',        // Columna C
+                D: row.c[3]?.v || '',        // Columna D
+                E: row.c[4]?.v || ''         // Columna E
+            }));
 
-    } catch (error) {
-        console.error('Error al obtener los datos:', error);
+            console.log("Datos cargados:", datosOriginales); // Debug: Verifica los datos cargados
+        } catch (error) {
+            console.error('Error al obtener los datos:', error);
+        }
     }
-}
 
 // Función para filtrar los datos y mostrar en la tabla
 function cargarDatosFiltrados() {
