@@ -735,7 +735,7 @@ document.getElementById('guardar-cambios').addEventListener('click', async () =>
 
 async function guardarCambiosGoogleSheets(cambios) {
     // URL de tu endpoint de Google Apps Script (o API de Google Sheets)
-    const url = 'TU_URL_DEL_ENDPOINT';
+    const url = 'https://script.google.com/macros/s/AKfycbyWq7jwg0nYwJ1hLpoXCj8lA1uBOXp-lcMTKFzLiL8LY5OgeyqA2PGGw4eZpqFxO-ne/exec';
 
     const body = JSON.stringify({ cambios });
 
