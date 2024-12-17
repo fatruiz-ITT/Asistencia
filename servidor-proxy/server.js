@@ -1,34 +1,41 @@
+// Importar las dependencias necesarias
 const express = require('express');
 const fetch = require('node-fetch');
-const cors = require('cors');
-
 const app = express();
-const PORT = 3000; // El puerto en el que correrá el servidor
 
-// Configurar middleware
-app.use(cors()); // Permite solicitudes desde cualquier origen
-app.use(express.json()); // Permite parsear JSON en las solicitudes
+// Configurar el puerto
+const port = process.env.PORT || 3000;
 
-// Endpoint del proxy
+// Middleware para parsear las solicitudes JSON
+app.use(express.json());
+
+// Ruta de proxy para redirigir las solicitudes a Google Sheets u otro servicio
 app.post('/proxy', async (req, res) => {
-    const googleScriptURL = 'https://script.google.com/macros/s/AKfycbyWq7jwg0nYwJ1hLpoXCj8lA1uBOXp-lcMTKFzLiL8LY5OgeyqA2PGGw4eZpqFxO-ne/exec';
+    const { cambios } = req.body;
+
+    const urlGoogleSheets = 'https://script.google.com/macros/s/AKfycbyWq7jwg0nYwJ1hLpoXCj8lA1uBOXp-lcMTKFzLiL8LY5OgeyqA2PGGw4eZpqFxO-ne/exec'; // La URL de tu endpoint de Google Sheets
 
     try {
-        const response = await fetch(googleScriptURL, {
+        // Hacer la solicitud a Google Sheets
+        const response = await fetch(urlGoogleSheets, {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(req.body), // Pasar el cuerpo original al servidor
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ cambios })
         });
 
-        const data = await response.json(); // Convertir respuesta a JSON
-        res.json(data); // Enviar respuesta de vuelta al cliente
+        // Parsear la respuesta y devolverla al cliente
+        const data = await response.json();
+        res.json(data);
     } catch (error) {
         console.error('Error en el proxy:', error);
-        res.status(500).json({ success: false, message: 'Error al reenviar la solicitud.' });
+        res.status(500).json({ error: 'Hubo un error al procesar la solicitud' });
     }
 });
 
 // Iniciar el servidor
-app.listen(PORT, () => {
-    console.log(`Servidor proxy activo en http://localhost:${PORT}`);
+app.listen(port, () => {
+    console.log(`Servidor escuchando en el puerto ${port}`);
 });
+//Prueba de codigo
