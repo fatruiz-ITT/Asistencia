@@ -645,29 +645,71 @@ async function cargarEmpresasImprimir() {
     });
 }
 
+let datosOriginales = []; // Guarda los datos completos
+
+// Función para cargar datos completos
 async function obtenerDatosGoogleSheets() {
     const url = 'https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos';
 
     try {
         const response = await fetch(url);
         const text = await response.text();
-        const json = JSON.parse(text.substring(47).slice(0, -2)); // Eliminar caracteres innecesarios
+        const json = JSON.parse(text.substring(47).slice(0, -2)); // Procesar JSON
 
-        // Procesar las columnas B, C, D y E (índices 1, 2, 3 y 4)
-        const rows = json.table.rows.map(row => {
-            return {
-                B: row.c[1]?.v || '',
-                C: row.c[2]?.v || '',
-                D: row.c[3]?.v || '',
-                E: row.c[4]?.v || ''
-            };
-        });
+        // Mapear las columnas (índices 0 = Empresa, 1 = Grupo, 2, 3, 4 y 5)
+        datosOriginales = json.table.rows.map(row => ({
+            Empresa: row.c[0]?.v || '',
+            Grupo: row.c[1]?.v || '',
+            B: row.c[2]?.v || '',
+            C: row.c[3]?.v || '',
+            D: row.c[4]?.v || '',
+            E: row.c[5]?.v || ''
+        }));
 
-        mostrarTablaEditable(rows);
+        cargarDatosFiltrados();
     } catch (error) {
-        console.error('Error al obtener datos de Google Sheets:', error);
+        console.error('Error al obtener datos:', error);
     }
 }
+
+// Función para filtrar y mostrar los datos
+function cargarDatosFiltrados() {
+    const empresaSeleccionada = document.getElementById('materia-imprimir').value;
+    const grupoSeleccionado = document.getElementById('grupo-imprimir').value;
+
+    // Filtrar los datos según Empresa y Grupo
+    const datosFiltrados = datosOriginales.filter(row => {
+        return (empresaSeleccionada ? row.Empresa === empresaSeleccionada : true) &&
+               (grupoSeleccionado ? row.Grupo === grupoSeleccionado : true);
+    });
+
+    mostrarTablaEditable(datosFiltrados);
+}
+
+// Función para mostrar los datos en la tabla
+function mostrarTablaEditable(rows) {
+    const tbody = document.querySelector('#tabla-alumnos tbody');
+    tbody.innerHTML = ''; // Limpiar tabla
+
+    rows.forEach((row, index) => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+            <td contenteditable="true" data-col="B" data-index="${index}">${row.B}</td>
+            <td contenteditable="true" data-col="C" data-index="${index}">${row.C}</td>
+            <td contenteditable="true" data-col="D" data-index="${index}">${row.D}</td>
+            <td contenteditable="true" data-col="E" data-index="${index}">${row.E}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById('popup-editar-tabla').style.display = 'block';
+}
+
+// Llamada inicial para cargar los datos completos
+obtenerDatosGoogleSheets();
+
 
 function mostrarTablaEditable(rows) {
     const tbody = document.querySelector('#tabla-alumnos tbody');
