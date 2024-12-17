@@ -390,7 +390,9 @@ function mostrarTabla(contenido, fecha) {
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                    <button type="button" class="btn btn-primary" onclick="imprimirTabla()">Imprimir</button>
+                    <button id="imprimir-lista" class="btn btn-warning mt-3" onclick="imprimirTabla()">
+                        <i class="fas fa-print"></i> Imprimir Lista
+                    </button>
                 </div>
             </div>
         </div>
