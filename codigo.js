@@ -389,7 +389,7 @@ function mostrarTabla(contenido, fecha) {
                     </table>
                 </div>
                 <div class="modal-footer">
-                    <button class="btn btn-secondary" data-bs-dismiss="modal">
+                    <button class="btn btn-secondary mt-3" data-bs-dismiss="modal">
                         <i class="fas fa-window-close"></i> Cerrar
                     </button>
                     <button id="imprimir-lista" class="btn btn-warning mt-3" onclick="imprimirTabla()">
@@ -425,8 +425,8 @@ function imprimirTabla() {
                     body { font-family: Arial, sans-serif; margin: 20px; color: #000; }
                     h3 { text-align: center; margin-bottom: 20px; }
                     .table { width: 100%; border-collapse: collapse; }
-                    .table th, .table td { border: 1px solid #000; padding: 8px; text-align: left; }
-                    .table thead { background-color: #343a40; color: #fff; }
+                    .table th, .table td { border: 2px solid #000; padding: 9px; text-align: center; }
+                    .table thead { background-color: #000; color: #fff; }
                     @media print {
                         body { margin: 0; }
                         .table { page-break-inside: auto; }
