@@ -688,7 +688,7 @@ function cargarDatosFiltrados() {
 // Función para mostrar datos en la tabla
 function mostrarTablaEditable(rows) {
     const tbody = document.querySelector('#tabla-alumnos2 tbody');
-    tbody.innerHTML = ''; // Limpiar la tabla
+    //tbody.innerHTML = ''; // Limpiar la tabla
 
     rows.forEach((row, index) => {
         const tr = document.createElement('tr');
