@@ -644,3 +644,94 @@ async function cargarEmpresasImprimir() {
         cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
     });
 }
+
+async function obtenerDatosGoogleSheets() {
+    const url = 'https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos';
+
+    try {
+        const response = await fetch(url);
+        const text = await response.text();
+        const json = JSON.parse(text.substring(47).slice(0, -2)); // Eliminar caracteres innecesarios
+
+        // Procesar las columnas B, C, D y E (índices 1, 2, 3 y 4)
+        const rows = json.table.rows.map(row => {
+            return {
+                B: row.c[1]?.v || '',
+                C: row.c[2]?.v || '',
+                D: row.c[3]?.v || '',
+                E: row.c[4]?.v || ''
+            };
+        });
+
+        mostrarTablaEditable(rows);
+    } catch (error) {
+        console.error('Error al obtener datos de Google Sheets:', error);
+    }
+}
+
+function mostrarTablaEditable(rows) {
+    const tbody = document.querySelector('#tabla-alumnos tbody');
+    tbody.innerHTML = ''; // Limpiar la tabla
+
+    rows.forEach((row, index) => {
+        const tr = document.createElement('tr');
+
+        tr.innerHTML = `
+            <td contenteditable="true" data-col="B" data-index="${index}">${row.B}</td>
+            <td contenteditable="true" data-col="C" data-index="${index}">${row.C}</td>
+            <td contenteditable="true" data-col="D" data-index="${index}">${row.D}</td>
+            <td contenteditable="true" data-col="E" data-index="${index}">${row.E}</td>
+        `;
+
+        tbody.appendChild(tr);
+    });
+
+    document.getElementById('popup-editar-tabla').style.display = 'block';
+}
+
+async function guardarCambiosEnGoogleSheets() {
+    const accessToken = await renovarAccessToken();
+    const values = [];
+
+    // Leer los datos editados de la tabla
+    document.querySelectorAll('#tabla-alumnos tbody tr').forEach(row => {
+        const cols = row.querySelectorAll('td');
+        values.push([cols[0].innerText, cols[1].innerText, cols[2].innerText, cols[3].innerText]);
+    });
+
+    const requestBody = {
+        values: values
+    };
+
+    try {
+        const sheetId = '1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc';
+        const range = 'AnexoAlumnos!B2:E'; // Rango a actualizar
+
+        const response = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?valueInputOption=USER_ENTERED`,
+            {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${accessToken}`
+                },
+                body: JSON.stringify(requestBody)
+            }
+        );
+
+        if (response.ok) {
+            alert('Datos guardados exitosamente.');
+        } else {
+            console.error('Error al guardar los cambios:', await response.text());
+        }
+    } catch (error) {
+        console.error('Error al guardar los cambios:', error);
+    }
+}
+
+// Evento del botón Guardar
+document.getElementById('guardar-cambios').addEventListener('click', guardarCambiosEnGoogleSheets);
+
+document.getElementById('imprimir-lista').addEventListener('click', () => {
+    obtenerDatosGoogleSheets();
+});
