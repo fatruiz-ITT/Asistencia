@@ -734,16 +734,18 @@ document.getElementById('guardar-cambios').addEventListener('click', async () =>
 });
 
 async function guardarCambiosGoogleSheets(cambios) {
-    // URL de tu endpoint de Google Apps Script (o API de Google Sheets)
+    // Proxy para evitar el error de CORS
+    const proxyUrl = 'https://cors-anywhere.herokuapp.com/';
     const url = 'https://script.google.com/macros/s/AKfycbyWq7jwg0nYwJ1hLpoXCj8lA1uBOXp-lcMTKFzLiL8LY5OgeyqA2PGGw4eZpqFxO-ne/exec';
+
+    const fullUrl = proxyUrl + url; // Combinar el proxy con tu URL
 
     const body = JSON.stringify({ cambios });
 
     try {
-        // Enviar los cambios a Google Sheets
-        const response = await fetch(url, {
+        // Enviar los cambios a Google Sheets a través del proxy
+        const response = await fetch(fullUrl, {
             method: 'POST',
-          //  mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -751,7 +753,8 @@ async function guardarCambiosGoogleSheets(cambios) {
         });
 
         const data = await response.json();
-        console.log(data);
+        console.log('Respuesta del servidor:', data);
+
         if (data.success) {
             alert('Cambios guardados correctamente');
         } else {
@@ -762,6 +765,7 @@ async function guardarCambiosGoogleSheets(cambios) {
         alert('Hubo un error al guardar los cambios');
     }
 }
+
 
 // Escuchar cambios en los dropdowns
 document.getElementById('materia-imprimir').addEventListener('change', cargarDatosFiltrados);
