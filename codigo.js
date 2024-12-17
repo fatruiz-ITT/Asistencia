@@ -708,7 +708,7 @@ function mostrarTablaEditable(rows) {
 
 // Función para guardar los cambios en Google Sheets
 // URL de tu Google Apps Script Web App (cambia esto por la tuya)
-const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/TU-SCRIPT-ID/exec";
+const GOOGLE_SHEET_API_URL = "https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos";
 
 // Tabla y botón
 const tabla = document.getElementById("tabla-alumnos2").querySelector("tbody");
