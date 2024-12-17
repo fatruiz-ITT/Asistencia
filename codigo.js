@@ -707,50 +707,96 @@ function mostrarTablaEditable(rows) {
 }
 
 // Función para guardar los cambios en Google Sheets
-async function guardarCambiosEnGoogleSheets() {
-    const accessToken = await renovarAccessToken();
-    const values = [];
+// URL de tu Google Apps Script Web App (cambia esto por la tuya)
+const GOOGLE_SHEET_API_URL = "https://script.google.com/macros/s/TU-SCRIPT-ID/exec";
 
-    // Obtener datos editados de la tabla
-    document.querySelectorAll('#tabla-alumnos2 tbody tr').forEach(row => {
-        const cols = row.querySelectorAll('td');
-        values.push([cols[0].innerText, cols[1].innerText, cols[2].innerText, cols[3].innerText]);
+// Tabla y botón
+const tabla = document.getElementById("tabla-alumnos2").querySelector("tbody");
+const btnGuardar = document.getElementById("guardar-cambios");
+
+// Variable para almacenar cambios
+let cambios = [];
+
+// Función para cargar los datos dinámicos desde Google Sheets
+async function cargarDatosDinamicos() {
+  try {
+    const response = await fetch(GOOGLE_SHEET_API_URL); // Realiza un GET para obtener los datos
+    const datos = await response.json(); // Obtiene los datos en formato JSON
+
+    tabla.innerHTML = ""; // Limpia la tabla antes de agregar nuevos datos
+    datos.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td contenteditable="true" data-columna="B">${row.numeroEmpleado}</td>
+        <td contenteditable="true" data-columna="C">${row.nombreAlumno}</td>
+        <td contenteditable="true" data-columna="D">${row.grupo}</td>
+        <td contenteditable="true" data-columna="E">${row.empresa}</td>
+      `;
+      tabla.appendChild(tr);
+    });
+    alert("Datos cargados correctamente.");
+  } catch (error) {
+    console.error("Error al cargar los datos:", error);
+    alert("Ocurrió un error al cargar los datos.");
+  }
+}
+
+// Función que guarda los cambios realizados
+async function guardarCambiosEnGoogleSheets() {
+  if (cambios.length === 0) {
+    alert("No hay cambios para guardar.");
+    return;
+  }
+
+  try {
+    // Realiza una solicitud POST para enviar los cambios
+    const response = await fetch(GOOGLE_SHEET_API_URL, {
+      method: "POST",
+      body: JSON.stringify({ cambios: cambios }),
+      headers: { "Content-Type": "application/json" },
     });
 
-    const requestBody = { values: values };
-
-    try {
-        const sheetId = '1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc';
-        const range = 'AnexoAlumnos!B2:E'; // Rango a actualizar
-
-        const response = await fetch(
-            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?valueInputOption=USER_ENTERED`,
-            {
-                method: 'PUT',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${accessToken}`
-                },
-                body: JSON.stringify(requestBody)
-            }
-        );
-
-        if (response.ok) {
-            alert('Datos guardados exitosamente.');
-        } else {
-            console.error('Error al guardar los cambios:', await response.text());
-        }
-    } catch (error) {
-        console.error('Error al guardar los cambios:', error);
+    const data = await response.json(); // Espera la respuesta en formato JSON
+    if (data.success) {
+      alert(`Cambios guardados:\n${data.mensajes.join("\n")}`);
+      cambios = []; // Limpia la lista de cambios después de guardarlos
+    } else {
+      alert("Error al actualizar los datos.");
     }
+  } catch (error) {
+    console.error("Error al guardar los cambios:", error);
+    alert("Ocurrió un error al guardar los cambios.");
+  }
 }
+
+// Escucha los cambios realizados en la tabla
+tabla.addEventListener("input", (e) => {
+  const celda = e.target;
+  if (celda.tagName === "TD" && celda.dataset.columna) {
+    const fila = celda.parentElement;
+    const numeroEmpleado = fila.children[0].textContent;
+    cambios.push({
+      numeroEmpleado: numeroEmpleado,
+      columna: celda.dataset.columna,
+      nuevoValor: celda.textContent,
+    });
+  }
+});
+
+// Función principal que se ejecuta al presionar el botón
+btnGuardar.addEventListener("click", async () => {
+  // Cargar los datos dinámicos desde Google Sheets
+  await cargarDatosDinamicos();
+
+  // Guardar los cambios realizados
+  await guardarCambiosEnGoogleSheets();
+});
+
 
 // Escuchar cambios en los dropdowns
 document.getElementById('materia-imprimir').addEventListener('change', cargarDatosFiltrados);
 document.getElementById('grupo-imprimir').addEventListener('change', cargarDatosFiltrados);
 
-// Botón Guardar Cambios
-document.getElementById('guardar-cambios').addEventListener('click', guardarCambiosEnGoogleSheets);
 
 // Inicializar datos
 obtenerDatosGoogleSheets();
