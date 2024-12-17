@@ -654,71 +654,71 @@ async function obtenerDatosGoogleSheets() {
     try {
         const response = await fetch(url);
         const text = await response.text();
-        // Extraer solo el contenido JSON válido de la respuesta
-            const jsonData = JSON.parse(text.substring(47).slice(0, -2));
+        const json = JSON.parse(text.substring(47).slice(0, -2)); // Procesar JSON
 
-            // Mapear las filas del JSON a un formato más usable
-            datosOriginales = jsonData.table.rows.map(row => ({
-                Empresa: row.c[4]?.v || '',  // Columna A
-                Grupo: row.c[3]?.v || '',    // Columna B
-                B: row.c[1]?.v || '',        // Columna B (repitiendo por simplicidad)
-                C: row.c[2]?.v || '',        // Columna C
-                D: row.c[3]?.v || '',        // Columna D
-                E: row.c[4]?.v || ''         // Columna E
-            }));
+        // Mapear las columnas (índices 0 = Empresa, 1 = Grupo, 2, 3, 4 y 5)
+        datosOriginales = json.table.rows.map(row => ({
+            B: row.c[1]?.v || '',
+            C: row.c[2]?.v || '',
+            D: row.c[3]?.v || '',
+            E: row.c[4]?.v || ''
+        }));
 
-            console.log("Datos cargados:", datosOriginales); // Debug: Verifica los datos cargados
-        } catch (error) {
-            console.error('Error al obtener los datos:', error);
-        }
+        cargarDatosFiltrados();
+    } catch (error) {
+        console.error('Error al obtener datos:', error);
     }
+}
 
-// Función para filtrar los datos y mostrar en la tabla
+// Función para filtrar y mostrar los datos
 function cargarDatosFiltrados() {
     const empresaSeleccionada = document.getElementById('materia-imprimir').value;
     const grupoSeleccionado = document.getElementById('grupo-imprimir').value;
 
-    if (empresaSeleccionada && grupoSeleccionado) {
-        const datosFiltrados = datosOriginales.filter(row =>
-            row.Empresa === empresaSeleccionada && row.Grupo === grupoSeleccionado
-        );
+    // Filtrar los datos según Empresa y Grupo
+    const datosFiltrados = datosOriginales.filter(row => {
+        return (empresaSeleccionada ? row.Empresa === empresaSeleccionada : true) &&
+               (grupoSeleccionado ? row.Grupo === grupoSeleccionado : true);
+    });
 
-        mostrarTablaEditable(datosFiltrados);
-    }
+    mostrarTablaEditable(datosFiltrados);
 }
 
-// Función para mostrar datos en la tabla
+// Función para mostrar los datos en la tabla
 function mostrarTablaEditable(rows) {
-    const tbody = document.querySelector('#tabla-alumnos2 tbody');
-    //tbody.innerHTML = ''; // Limpiar la tabla
+    const tbody = document.querySelector('#tabla-edicion tbody');
+    tbody.innerHTML = ''; // Limpiar tabla
 
     rows.forEach((row, index) => {
         const tr = document.createElement('tr');
+
         tr.innerHTML = `
-            <td contenteditable="true" data-index="${index}" data-col="B">${row.B}</td>
-            <td contenteditable="true" data-index="${index}" data-col="C">${row.C}</td>
-            <td contenteditable="true" data-index="${index}" data-col="D">${row.D}</td>
-            <td contenteditable="true" data-index="${index}" data-col="E">${row.E}</td>
+            <td contenteditable="true" data-col="B" data-index="${index}">${row.B}</td>
+            <td contenteditable="true" data-col="C" data-index="${index}">${row.C}</td>
+            <td contenteditable="true" data-col="D" data-index="${index}">${row.D}</td>
+            <td contenteditable="true" data-col="E" data-index="${index}">${row.E}</td>
         `;
+
         tbody.appendChild(tr);
     });
-
-    document.getElementById('popup-editar-tabla').style.display = 'block';
-    console.log("Datos mostrados en la tabla:", rows);
 }
 
-// Función para guardar los cambios en Google Sheets
+// Llamada inicial para cargar los datos completos
+obtenerDatosGoogleSheets();
+
 async function guardarCambiosEnGoogleSheets() {
     const accessToken = await renovarAccessToken();
     const values = [];
 
-    // Obtener datos editados de la tabla
-    document.querySelectorAll('#tabla-alumnos2 tbody tr').forEach(row => {
+    // Leer los datos editados de la tabla
+    document.querySelectorAll('#tabla-edicion tbody tr').forEach(row => {
         const cols = row.querySelectorAll('td');
         values.push([cols[0].innerText, cols[1].innerText, cols[2].innerText, cols[3].innerText]);
     });
 
-    const requestBody = { values: values };
+    const requestBody = {
+        values: values
+    };
 
     try {
         const sheetId = '1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc';
@@ -746,12 +746,12 @@ async function guardarCambiosEnGoogleSheets() {
     }
 }
 
-// Escuchar cambios en los dropdowns
-document.getElementById('materia-imprimir').addEventListener('change', cargarDatosFiltrados);
-document.getElementById('grupo-imprimir').addEventListener('change', cargarDatosFiltrados);
-
-// Botón Guardar Cambios
+// Evento del botón Guardar
 document.getElementById('guardar-cambios').addEventListener('click', guardarCambiosEnGoogleSheets);
+
+document.getElementById('imprimir-lista').addEventListener('click', () => {
+    obtenerDatosGoogleSheets();
+});
 
 // Inicializar datos
 obtenerDatosGoogleSheets();
