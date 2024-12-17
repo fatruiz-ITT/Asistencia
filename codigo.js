@@ -688,7 +688,7 @@ function cargarDatosFiltrados() {
 
 // Función para mostrar los datos en la tabla
 function mostrarTablaEditable(rows) {
-    const tbody = document.querySelector('#tabla-alumnos tbody');
+    const tbody = document.querySelector('#tabla-alumnos2 tbody');
     tbody.innerHTML = ''; // Limpiar tabla
 
     rows.forEach((row, index) => {
@@ -704,7 +704,6 @@ function mostrarTablaEditable(rows) {
         tbody.appendChild(tr);
     });
 
-    document.getElementById('popup-editar-tabla').style.display = 'block';
 }
 
 // Llamada inicial para cargar los datos completos
