@@ -344,47 +344,93 @@ async function descargarContenidoArchivo(fileId, accessToken) {
 
 // Mostrar la tabla con los datos
 function mostrarTabla(contenido, fecha) {
-    // Elimina cualquier tabla anterior existente
-    const tablaExistente = document.getElementById('tabla-contenedor');
-    if (tablaExistente) {
-        tablaExistente.remove();
+    // Elimina cualquier modal anterior existente
+    const modalExistente = document.getElementById('tabla-modal');
+    if (modalExistente) {
+        modalExistente.remove();
     }
 
     const filas = contenido.trim().split('\n'); // Divide el contenido por líneas
     const datos = filas.map(fila => fila.split(',')); // Divide cada línea por comas
 
-    // Crear contenedor principal para la tabla
-    const contenedor = document.createElement('div');
-    contenedor.id = 'tabla-contenedor'; // Añade un ID único para identificar este contenedor
-    contenedor.className = 'container mt-3';
-
-    // Contenido HTML para la tabla y el botón de imprimir
-    contenedor.innerHTML = `
-        <h3 class="text-center">Lista del día ${formatearFechaVisual(fecha)}</h3>
-        <table class="table table-bordered">
-            <thead class="table-dark">
-                <tr>
-                    <th>Número de Empleado</th>
-                    <th>Nombre del Alumno</th>
-                    <th>Asistió</th>
-                    <th>Empresa</th>
-                </tr>
-            </thead>
-            <tbody>
-                ${datos.map(d => `
-                    <tr>
-                        <td>${d[0]}</td>
-                        <td>${d[1]}</td>
-                        <td>${d[2]}</td>
-                        <td>${d[3]}</td>
-                    </tr>`).join('')}
-            </tbody>
-        </table>
+    // Crear el modal y su contenido
+    const modal = document.createElement('div');
+    modal.id = 'tabla-modal';
+    modal.className = 'modal fade';
+    modal.tabIndex = '-1';
+    modal.setAttribute('aria-labelledby', 'tablaModalLabel');
+    modal.setAttribute('aria-hidden', 'true');
+    modal.innerHTML = `
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="tablaModalLabel">Lista del día ${formatearFechaVisual(fecha)}</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered">
+                        <thead class="table-dark">
+                            <tr>
+                                <th>Número de Empleado</th>
+                                <th>Nombre del Alumno</th>
+                                <th>Asistió</th>
+                                <th>Empresa</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${datos.map(d => `
+                                <tr>
+                                    <td>${d[0]}</td>
+                                    <td>${d[1]}</td>
+                                    <td>${d[2]}</td>
+                                    <td>${d[3]}</td>
+                                </tr>`).join('')}
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                    <button type="button" class="btn btn-primary" onclick="imprimirTabla()">Imprimir</button>
+                </div>
+            </div>
+        </div>
     `;
 
-    // Añadir el contenedor al cuerpo del documento
-    document.body.appendChild(contenedor);
+    // Añadir el modal al cuerpo del documento
+    document.body.appendChild(modal);
+
+    // Mostrar el modal
+    const modalBootstrap = new bootstrap.Modal(modal);
+    modalBootstrap.show();
 }
+
+// Función para imprimir la tabla (opcional)
+function imprimirTabla() {
+    const modalContent = document.querySelector('#tabla-modal .modal-content').innerHTML;
+    const ventanaImpresion = window.open('', '_blank', 'width=800,height=600');
+    ventanaImpresion.document.open();
+    ventanaImpresion.document.write(`
+        <html>
+            <head>
+                <title>Imprimir Lista</title>
+                <style>
+                    body { font-family: Arial, sans-serif; margin: 20px; }
+                    .table { width: 100%; border-collapse: collapse; }
+                    .table th, .table td { border: 1px solid #000; padding: 8px; text-align: left; }
+                    .table thead { background-color: #343a40; color: #fff; }
+                </style>
+            </head>
+            <body>
+                ${modalContent}
+            </body>
+        </html>
+    `);
+    ventanaImpresion.document.close();
+    ventanaImpresion.focus();
+    ventanaImpresion.print();
+    ventanaImpresion.close();
+}
+
 
 
 // Renueva el token de acceso
