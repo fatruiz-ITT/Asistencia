@@ -658,12 +658,12 @@ async function obtenerDatosGoogleSheets() {
 
         // Mapear las columnas (índices 0 = Empresa, 1 = Grupo, 2, 3, 4 y 5)
         datosOriginales = json.table.rows.map(row => ({
-            Empresa: row.c[0]?.v || '',
-            Grupo: row.c[1]?.v || '',
-            B: row.c[2]?.v || '',
-            C: row.c[3]?.v || '',
-            D: row.c[4]?.v || '',
-            E: row.c[5]?.v || ''
+            Empresa: row.c[4]?.v || '',
+            Grupo: row.c[3]?.v || '',
+            B: row.c[1]?.v || '',
+            C: row.c[2]?.v || '',
+            D: row.c[3]?.v || '',
+            E: row.c[4]?.v || ''
         }));
 
         cargarDatosFiltrados();
