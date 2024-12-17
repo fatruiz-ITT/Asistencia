@@ -292,11 +292,6 @@ function mostrarTabla(contenido, fecha) {
                     </tr>`).join('')}
             </tbody>
         </table>
-        <div class="text-center mt-3">
-           <button class="btn btn-primary" id="btn-imprimir">
-               <i class="fas fa-print"></i> Imprimir
-           </button>
-       </div><p>
     `;
 
     // Añadir el contenedor al cuerpo del documento
