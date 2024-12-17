@@ -706,6 +706,60 @@ function mostrarTablaEditable(rows) {
     console.log("Datos mostrados en la tabla:", rows);
 }
 
+document.getElementById('guardar-cambios').addEventListener('click', async () => {
+    const tbody = document.querySelector('#tabla-alumnos2 tbody');
+    const filas = Array.from(tbody.rows);
+    const cambios = [];
+
+    // Recorremos las filas de la tabla y recogemos las modificaciones
+    filas.forEach(fila => {
+        const index = fila.querySelector('[data-index]').dataset.index;
+        const updatedB = fila.querySelector('[data-col="B"]').textContent;
+        const updatedC = fila.querySelector('[data-col="C"]').textContent;
+        const updatedD = fila.querySelector('[data-col="D"]').textContent;
+        const updatedE = fila.querySelector('[data-col="E"]').textContent;
+
+        // Guardamos los cambios (con el índice como referencia, si es necesario)
+        cambios.push({
+            index,
+            B: updatedB,
+            C: updatedC,
+            D: updatedD,
+            E: updatedE
+        });
+    });
+
+    // Llamar a la función que actualizará los datos en Google Sheets
+    await guardarCambiosGoogleSheets(cambios);
+});
+
+async function guardarCambiosGoogleSheets(cambios) {
+    // URL de tu endpoint de Google Apps Script (o API de Google Sheets)
+    const url = 'TU_URL_DEL_ENDPOINT';
+
+    const body = JSON.stringify({ cambios });
+
+    try {
+        // Enviar los cambios a Google Sheets
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: body,
+        });
+
+        const data = await response.json();
+        if (data.success) {
+            alert('Cambios guardados correctamente');
+        } else {
+            alert('Error al guardar los cambios');
+        }
+    } catch (error) {
+        console.error('Error al guardar los cambios:', error);
+        alert('Hubo un error al guardar los cambios');
+    }
+}
 
 // Escuchar cambios en los dropdowns
 document.getElementById('materia-imprimir').addEventListener('change', cargarDatosFiltrados);
