@@ -52,6 +52,24 @@
             max-width: 100%;
             overflow-x: auto;
         }
+        /* Contenedor responsivo para el iframe */
+       .iframe-container {
+           position: relative;
+           width: 100%;
+           height: 0;
+           padding-bottom: 56.25%; /* Esto mantiene una relación de aspecto 16:9 */
+           overflow: hidden;
+       }
+
+       /* El iframe se ajusta al tamaño del contenedor */
+       .iframe-container iframe {
+           position: absolute;
+           top: 0;
+           left: 0;
+           width: 100%;
+           height: 100%;
+           border: none;
+       }
 
        /* Estilo del checkbox */
        input[type="checkbox"] {
@@ -192,31 +210,12 @@
               </select>
           </div>
 
-          <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTsmuqys8UxDah1LW8x9DYAz-O-qc0KAqOz5FCusR70wjxloz-Am_A7xIZWZStQ4VD2mTndgaN_7R0f/pubhtml?gid=529173130&amp;single=true&amp;widget=true&amp;headers=false"></iframe>
-      <div class="card" id="popup-editar-tabla" style="display: none;">
-          <div class="card-header">
-              <h3 class="text-center">Lista Alumnos</h3>
-          </div>
-          <div class="card-body">
-              <table id="tabla-alumnos2" class="table table-bordered table-striped">
-                  <thead>
-                      <tr>
-                          <th>Numero de Empleado</th>
-                          <th>Nombre del Alumno</th>
-                          <th>Grupo</th>
-                          <th>Empresa</th>
-                      </tr>
-                    </thead>
-               <tbody></tbody>
-           </table>
+          <div class="iframe-container">
+        <iframe src="https://docs.google.com/spreadsheets/d/e/2PACX-1vTsmuqys8UxDah1LW8x9DYAz-O-qc0KAqOz5FCusR70wjxloz-Am_A7xIZWZStQ4VD2mTndgaN_7R0f/pubhtml?gid=529173130&amp;single=true&amp;widget=true&amp;headers=false"
+                frameborder="0" allowfullscreen>
+        </iframe>
+    </div>
 
-              <div class="d-flex justify-content-center">
-                  <button id="guardar-cambios" class="btn btn-success mt-3">
-                      Guardar Cambios
-                  </button>
-              </div>
-          </div>
-      </div>
   </div>
 
     </div>
