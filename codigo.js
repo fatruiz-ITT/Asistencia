@@ -645,102 +645,77 @@ async function cargarEmpresasImprimir() {
     });
 }
 
-let datosOriginales = []; // Guarda los datos completos
+let datosOriginales = []; // Guarda todos los datos originales
 
-// Función para cargar datos completos
+// Función para obtener los datos desde Google Sheets
 async function obtenerDatosGoogleSheets() {
     const url = 'https://docs.google.com/spreadsheets/d/1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc/gviz/tq?tqx=out:json&sheet=AnexoAlumnos';
 
     try {
         const response = await fetch(url);
         const text = await response.text();
-        const json = JSON.parse(text.substring(47).slice(0, -2)); // Procesar JSON
+        const json = JSON.parse(text.substring(47).slice(0, -2));
 
-        // Mapear las columnas (índices 0 = Empresa, 1 = Grupo, 2, 3, 4 y 5)
+        // Mapear los datos de las columnas
         datosOriginales = json.table.rows.map(row => ({
+            Empresa: row.c[0]?.v || '',
+            Grupo: row.c[1]?.v || '',
             B: row.c[1]?.v || '',
             C: row.c[2]?.v || '',
             D: row.c[3]?.v || '',
             E: row.c[4]?.v || ''
         }));
 
-        cargarDatosFiltrados();
     } catch (error) {
-        console.error('Error al obtener datos:', error);
+        console.error('Error al obtener los datos:', error);
     }
 }
 
-// Función para filtrar y mostrar los datos
+// Función para filtrar los datos y mostrar en la tabla
 function cargarDatosFiltrados() {
     const empresaSeleccionada = document.getElementById('materia-imprimir').value;
     const grupoSeleccionado = document.getElementById('grupo-imprimir').value;
 
-    // Filtrar los datos según Empresa y Grupo
-    const datosFiltrados = datosOriginales.filter(row => {
-        return (empresaSeleccionada ? row.Empresa === empresaSeleccionada : true) &&
-               (grupoSeleccionado ? row.Grupo === grupoSeleccionado : true);
-    });
+    if (empresaSeleccionada && grupoSeleccionado) {
+        const datosFiltrados = datosOriginales.filter(row =>
+            row.Empresa === empresaSeleccionada && row.Grupo === grupoSeleccionado
+        );
 
-    mostrarTablaEditable(datosFiltrados);
+        mostrarTablaEditable(datosFiltrados);
+    }
 }
 
-// Función para mostrar los datos en la tabla
+// Función para mostrar datos en la tabla
 function mostrarTablaEditable(rows) {
     const tbody = document.querySelector('#tabla-alumnos2 tbody');
-    tbody.innerHTML = ''; // Limpiar tabla
-
-    rows.forEach((row, index) => {
-        const tr = document.createElement('tr');
-
-        tr.innerHTML = `
-            <td contenteditable="true" data-col="B" data-index="${index}">${row.B}</td>
-            <td contenteditable="true" data-col="C" data-index="${index}">${row.C}</td>
-            <td contenteditable="true" data-col="D" data-index="${index}">${row.D}</td>
-            <td contenteditable="true" data-col="E" data-index="${index}">${row.E}</td>
-        `;
-
-        tbody.appendChild(tr);
-    });
-
-}
-
-// Llamada inicial para cargar los datos completos
-obtenerDatosGoogleSheets();
-
-
-function mostrarTablaEditable(rows) {
-    const tbody = document.querySelector('#tabla-alumnos tbody');
     tbody.innerHTML = ''; // Limpiar la tabla
 
     rows.forEach((row, index) => {
         const tr = document.createElement('tr');
-
         tr.innerHTML = `
-            <td contenteditable="true" data-col="B" data-index="${index}">${row.B}</td>
-            <td contenteditable="true" data-col="C" data-index="${index}">${row.C}</td>
-            <td contenteditable="true" data-col="D" data-index="${index}">${row.D}</td>
-            <td contenteditable="true" data-col="E" data-index="${index}">${row.E}</td>
+            <td contenteditable="true" data-index="${index}" data-col="B">${row.B}</td>
+            <td contenteditable="true" data-index="${index}" data-col="C">${row.C}</td>
+            <td contenteditable="true" data-index="${index}" data-col="D">${row.D}</td>
+            <td contenteditable="true" data-index="${index}" data-col="E">${row.E}</td>
         `;
-
         tbody.appendChild(tr);
     });
 
     document.getElementById('popup-editar-tabla').style.display = 'block';
 }
 
+// Función para guardar los cambios en Google Sheets
 async function guardarCambiosEnGoogleSheets() {
     const accessToken = await renovarAccessToken();
     const values = [];
 
-    // Leer los datos editados de la tabla
-    document.querySelectorAll('#tabla-alumnos tbody tr').forEach(row => {
+    // Obtener datos editados de la tabla
+    document.querySelectorAll('#tabla-alumnos2 tbody tr').forEach(row => {
         const cols = row.querySelectorAll('td');
         values.push([cols[0].innerText, cols[1].innerText, cols[2].innerText, cols[3].innerText]);
     });
 
-    const requestBody = {
-        values: values
-    };
+    const requestBody = { values: values };
 
     try {
         const sheetId = '1sLO2eSk409iWY7T_t0Dj0PMuqg9TK6gDmzmnk77jWgc';
@@ -768,9 +743,12 @@ async function guardarCambiosEnGoogleSheets() {
     }
 }
 
-// Evento del botón Guardar
+// Escuchar cambios en los dropdowns
+document.getElementById('materia-imprimir').addEventListener('change', cargarDatosFiltrados);
+document.getElementById('grupo-imprimir').addEventListener('change', cargarDatosFiltrados);
+
+// Botón Guardar Cambios
 document.getElementById('guardar-cambios').addEventListener('click', guardarCambiosEnGoogleSheets);
 
-document.getElementById('imprimir-lista').addEventListener('click', () => {
-    obtenerDatosGoogleSheets();
-});
+// Inicializar datos
+obtenerDatosGoogleSheets();
