@@ -704,6 +704,7 @@ function mostrarTablaEditable(rows) {
     });
 
     document.getElementById('popup-editar-tabla').style.display = 'block';
+    console.log("Datos mostrados en la tabla:", rows);
 }
 
 // Función para guardar los cambios en Google Sheets
