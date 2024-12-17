@@ -743,7 +743,7 @@ async function guardarCambiosGoogleSheets(cambios) {
         // Enviar los cambios a Google Sheets
         const response = await fetch(url, {
             method: 'POST',
-            mode: 'no-cors',
+          //  mode: 'no-cors',
             headers: {
                 'Content-Type': 'application/json',
             },
@@ -751,6 +751,7 @@ async function guardarCambiosGoogleSheets(cambios) {
         });
 
         const data = await response.json();
+        console.log(data);
         if (data.success) {
             alert('Cambios guardados correctamente');
         } else {
