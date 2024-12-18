@@ -57,6 +57,22 @@
        input[type="checkbox"] {
            transform: scale(2.0);
        }
+       .d-flex {
+            display: flex;
+            justify-content: center; /* Centra los elementos horizontalmente */
+            align-items: flex-start; /* Alinea los elementos arriba */
+            gap: 2rem; /* Espacio entre elementos */
+            flex-wrap: wrap; /* Permite que los elementos se ajusten en pantallas pequeñas */
+       }
+
+        .mb-33 {
+            width: 200px; /* Ancho uniforme de cada elemento */
+       }
+
+        h2 {
+        margin-bottom: 2rem; /* Espaciado debajo del título */
+        text-align: center; /* Centra el título */
+        }
     </style>
 </head>
 <body>
@@ -65,25 +81,35 @@
             <h1>Gestión de Alumnos de la Profesora Kenia</h1>
         </div>
 
-        <div class="menu-container mt-4">
-            <button id="btn-anexar" class="btn btn-primary btn-custom menu-item">
-                <i class="fas fa-user-plus icon-large"></i> Anexar Alumnos
-            </button>
-            <button id="btn-pasar-lista" class="btn btn-success btn-custom menu-item">
-                <i class="fas fa-clipboard-list icon-large"></i> Pasar Lista
-            </button>
-            <button id="btn-imprimir" class="btn btn-warning btn-custom menu-item">
-                <i class="fas fa-edit icon-large"></i> Modificar Alumnos
-            </button>
-            <button id="btn-visualizar" class="btn btn-info btn-custom menu-item">
-                <i class="fas fa-eye icon-large"></i> Visualizar Lista
-            </button>
-            <button id="btn-borrar" class="btn btn-danger btn-custom menu-item">
-                <i class="fas fa-trash-alt icon-large"></i> Borrar
-            </button>
-        </div>
+        <!-- Navbar content -->
+ <nav class="navbar navbar-light" style="background-color: #E8E8E8;">
+         <div class="menu-container mt-6" align="center">
+             <button id="btn-anexar" class="btn btn-primary btn-custom menu-item">
+                 <i class="fas fa-user-plus icon-large"></i> Anexar Alumnos
+             </button>
+             <button id="btn-pasar-lista" class="btn btn-success btn-custom menu-item">
+                 <i class="fas fa-clipboard-list icon-large"></i> Pasar Lista
+             </button>
+             <button id="btn-imprimir" class="btn btn-warning btn-custom menu-item">
+                 <i class="fas fa-edit icon-large"></i> Modificar Alumnos
+             </button>
+             <button id="btn-visualizar" class="btn btn-info btn-custom menu-item">
+                 <i class="fas fa-eye icon-large"></i> Visualizar Lista
+             </button>
+             <button id="btn-borrar" class="btn btn-danger btn-custom menu-item">
+                 <i class="fas fa-trash-alt icon-large"></i> Borrar
+             </button>
+             <button id="btn-sumarizar" class="btn btn-secondary btn-custom menu-item">
+                 <i class="fa-solid fa-filter icon-large"></i> Sumarizar
+             </button>
+         </div>
+ </nav>
 
-        <!-- Formularios de cada sección -->
+ <div class="card bg-light mb-1" style="max-width: 88rem;">
+<div class="card-header">Contenido</div>
+<div class="card-body">
+<p class="card-text">
+ <!-- Formularios de cada sección -->
         <div id="form-anexar" class="mt-5" style="display: none;">
             <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSe-pEVIEG2pKFc57SG7oVDWVjP_qvvz5RSTktbmFjaA6B8MnA/viewform?usp=sf_link" width="100%" height="600px" frameborder="0"></iframe>
         </div>
@@ -218,6 +244,46 @@
       </div>
   </div>
 
-    </div>
+  <div id="form-sumarizar" class="mt-4" style="display: none;">
+ <h2 class="text-center">Sumarizar Lista</h2>
+ <div class="d-flex justify-content-center gap-4 flex-wrap">
+     <!-- Fecha Inicial -->
+     <div class="mb-33">
+         <label for="fecha-inicial" class="form-label">Selecciona Fecha Inicial:</label>
+         <input type="date" id="fecha-inicial" class="form-control">
+     </div>
+
+     <!-- Fecha Final -->
+     <div class="mb-33">
+         <label for="fecha-final" class="form-label">Selecciona Fecha Final:</label>
+         <input type="date" id="fecha-final" class="form-control">
+     </div>
+
+     <!-- Materia 1 -->
+     <div class="mb-33">
+         <label for="sumarizar-materia" class="form-label">Selecciona Materia:</label>
+         <select id="sumarizar-materia" class="form-select">
+             <option value="">Selecciona una opción</option>
+         </select>
+     </div>
+
+     <!-- Materia 2 -->
+     <div class="mb-33">
+         <label for="sumarizar-salon" class="form-label">Selecciona Materia:</label>
+         <select id="sumarizar-salon" class="form-select">
+             <option value="">Selecciona una opción</option>
+         </select>
+     </div>
+ </div>
+
+   <div class="d-flex justify-content-center">
+       <button id="sumarizar-lista" class="btn btn-secondary mt-3">
+           <i class="fa-solid fa-filter"></i> Sumarizar Lista de Asistencia
+       </button>
+   </div>
+</div>
+
+</div>
+ </div>
 </body>
 </html>
