@@ -603,6 +603,7 @@ async function cargarEmpresasEliminar() {
         cargarAlumnos(data, materiaSeleccionada, grupoSeleccionado);
     });
 }
+cargarEmpresasEliminar();
 
 // Función para cargar empresas en el formulario de impresión
 async function cargarEmpresasImprimir() {
