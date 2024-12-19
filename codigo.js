@@ -1069,7 +1069,7 @@ document.getElementById('sumarizar-lista').addEventListener('click', async () =>
     const fechaInicio = document.getElementById('fecha-inicial').value;
     const fechaFin = document.getElementById('fecha-final').value;
     const materia = document.getElementById('sumarizar-materia').value;
-    const folderId = '1xPJ8ZCeR8hvWu38BRW8Mpr5jcOs6Cceu'; // Cambia este ID por tu carpeta de Google Drive
+    const folderId = '1HO_fZ_kqtEgyD9dWLcFnFA_nRd8UenkU'; // Cambia este ID por tu carpeta de Google Drive
     const estadoOperacion = document.getElementById('estado-operacion');
 
     if (!fechaInicio || !fechaFin || !materia) {
