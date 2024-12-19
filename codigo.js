@@ -1007,17 +1007,18 @@ function renderizarTabla(datos) {
 
 function imprimirTabla() {
     const tablaContainer = document.getElementById('tabla-container');
-    const botones = document.querySelectorAll('button'); // Seleccionar todos los botones visibles
+    const contenidoOriginal = document.body.innerHTML;
 
-    // Ocultar botones antes de imprimir
-    botones.forEach(boton => boton.style.display = 'none');
+    // Mostrar únicamente el contenido del recuadro rojo
+    document.body.innerHTML = tablaContainer.innerHTML;
 
-    // Invocar el cuadro de impresión
+    // Abrir el cuadro de impresión
     window.print();
 
-    // Restaurar visibilidad de los botones después de imprimir
-    botones.forEach(boton => boton.style.display = '');
+    // Restaurar el contenido original después de la impresión
+    document.body.innerHTML = contenidoOriginal;
 }
+
 
 
 
