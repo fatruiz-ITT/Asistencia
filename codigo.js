@@ -824,3 +824,285 @@ document.getElementById('grupo-imprimir').addEventListener('change', cargarDatos
 
 // Inicializar datos
 obtenerDatosGoogleSheets();
+
+
+//******************************************************************************************************
+
+
+// Renovar el Access Token para acceder a la API de Google Drive
+async function renovarAccessToken() {
+    const clientId = '355052591281-haj4ho65tfppr51ei49f93e79r0rsct1.apps.googleusercontent.com';
+    const clientSecret = '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';
+    const refreshToken = '1//046SR2Bd895DvCgYIARAAGAQSNwF-L9IrjlTcWBE6ibiN0dIHd-AyC1LYzIs0dFG1UjUQ7fLSPFweb3_5-ViUgLsjgMdQwnc9vd0';
+
+    const response = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+        body: new URLSearchParams({
+            client_id: clientId,
+            client_secret: clientSecret,
+            refresh_token: refreshToken,
+            grant_type: 'refresh_token',
+        }).toString(),
+    });
+
+    const data = await response.json();
+    if (!data.access_token) {
+        console.error("Error al renovar el Access Token:", data);
+        throw new Error("No se pudo renovar el Access Token.");
+    }
+    return data.access_token;
+}
+
+// Buscar archivos en Google Drive en base al nombre y carpeta
+async function buscarArchivos(token, nombreArchivo, folderId) {
+    const query = `'${folderId}' in parents and name contains '${nombreArchivo}' and trashed = false`;
+    const url = `https://www.googleapis.com/drive/v3/files?q=${encodeURIComponent(query)}&fields=files(id,name)`;
+
+    const response = await fetch(url, {
+        headers: { Authorization: `Bearer ${token}` },
+    });
+
+    const data = await response.json();
+    return data.files || [];
+}
+
+// Descargar contenido de un archivo desde Google Drive
+async function descargarArchivo(token, fileId, mimeType = 'text/plain') {
+    // Intentar descargar directamente
+    const downloadUrl = `https://www.googleapis.com/drive/v3/files/${fileId}?alt=media`;
+    const exportUrl = `https://www.googleapis.com/drive/v3/files/${fileId}/export?mimeType=${mimeType}`;
+
+    try {
+        let response = await fetch(downloadUrl, {
+            headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Si la descarga directa falla, intentar exportar el archivo
+        if (!response.ok) {
+            console.warn('Archivo no descargable directamente, intentando exportar...');
+            response = await fetch(exportUrl, {
+                headers: { Authorization: `Bearer ${token}` },
+            });
+
+            if (!response.ok) {
+                console.error('Error al exportar el archivo:', await response.text());
+                throw new Error('No se pudo exportar el archivo.');
+            }
+        }
+
+        const contenido = await response.text();
+        console.log('Contenido descargado o exportado:', contenido);
+        return contenido;
+    } catch (error) {
+        console.error('Error al descargar o exportar el archivo:', error);
+        throw error;
+    }
+}
+
+
+// Generar un rango de fechas entre dos fechas dadas
+function generarFechas(fechaInicial, fechaFinal) {
+    const fechas = [];
+    let fechaActual = new Date(fechaInicial);
+
+    while (fechaActual <= new Date(fechaFinal)) {
+        // Crear una nueva fecha para evitar modificaciones no deseadas
+        fechas.push(new Date(fechaActual.getTime()));
+        fechaActual.setDate(fechaActual.getDate() + 1); // Avanzar un día
+    }
+
+    return fechas;
+}
+
+
+// Formatear fechas en un formato legible para el nombre de archivo
+function formatearFechaNombre(fecha) {
+    const meses = ['ene', 'feb', 'mar', 'abr', 'may', 'jun', 'jul', 'ago', 'sep', 'oct', 'nov', 'dic'];
+    const fechaLocal = new Date(fecha.getTime()); // Crear una copia para trabajar
+    return `${meses[fechaLocal.getMonth()]} ${fechaLocal.getDate()} de ${fechaLocal.getFullYear()}`;
+}
+
+
+// Procesar el contenido descargado y extraer los datos relevantes
+// Parsear el contenido del archivo
+function parsearContenido(contenido, nombreArchivo) {
+    try {
+        const fecha = nombreArchivo.match(/(\w+\s\d{1,2}\sde\s\d{4})$/)?.[0] || '';
+        
+        // Verificar si el contenido es JSON
+        if (contenido.trim().startsWith('{') || contenido.trim().startsWith('[')) {
+            const datos = JSON.parse(contenido);
+            return datos.map(item => ({
+                numeroControl: item.numeroControl,
+                nombre: item.nombre,
+                materia: nombreArchivo.split('-')[0],
+                asistencia: item.asistencia,
+                fecha: fecha
+            }));
+        }
+
+        // Procesar contenido como CSV
+        const lineas = contenido.trim().split('\n');
+        return lineas.map(linea => {
+            const [numeroControl, nombre, asistencia, materia] = linea.split(',');
+            return {
+                numeroControl: numeroControl.trim(),
+                nombre: nombre.trim(),
+                materia: materia.trim(),
+                asistencia: asistencia.trim(),
+                fecha: fecha
+            };
+        });
+    } catch (error) {
+        console.error('Error procesando el contenido:', error);
+        return [];
+    }
+}
+
+
+// Renderizar la tabla en HTML con los datos procesados
+function renderizarTabla(datos) {
+    const tablaContainer = document.getElementById('tabla-container');
+    const columnas = ['Numero de control', 'Nombre del alumno', 'Materia', 'Asistio', 'Fecha de Asistencia'];
+
+    const tablaHTML = `
+        <table class="table">
+            <thead>
+                <tr>${columnas.map(col => `<th>${col}</th>`).join('')}</tr>
+            </thead>
+            <tbody>
+                ${datos.map(fila => `
+                    <tr>
+                        <td>${fila.numeroControl || ''}</td>
+                        <td>${fila.nombre || ''}</td>
+                        <td>${fila.materia || ''}</td>
+                        <td>${fila.asistencia || ''}</td>
+                        <td>${fila.fecha || ''}</td>
+                    </tr>
+                `).join('')}
+            </tbody>
+        </table>
+        <div id="botones-container" class="botones">
+        <div class="d-flex justify-content-center">
+            <button id="imprimir-tabla" class="btn btn-secondary mt-3">
+                <i class="fa fa-print"></i> Imprimir
+            </button>
+            <button id="exportar-csv" class="btn btn-secondary mt-3">
+                <i class="fa fa-table"></i> Exportar a CSV
+            </button>
+        </div>
+    `;
+
+    tablaContainer.innerHTML = tablaHTML;
+
+    // Agregar funcionalidad a los botones
+    document.getElementById('imprimir-tabla').addEventListener('click', () => {
+        imprimirTabla();
+    });
+    document.getElementById('exportar-csv').addEventListener('click', () => {
+        exportarCSV(datos);
+    });
+}
+
+function imprimirTabla() {
+    const tablaContainer = document.getElementById('tabla-container');
+    const botones = document.querySelectorAll('button'); // Seleccionar todos los botones visibles
+
+    // Ocultar botones antes de imprimir
+    botones.forEach(boton => boton.style.display = 'none');
+
+    // Invocar el cuadro de impresión
+    window.print();
+
+    // Restaurar visibilidad de los botones después de imprimir
+    botones.forEach(boton => boton.style.display = '');
+}
+
+
+
+// Exportar los datos a CSV
+function exportarCSV(datos) {
+    const columnas = ['Numero de control', 'Nombre del alumno', 'Materia', 'Asistio', 'Fecha de Asistencia'];
+    const contenido = [
+        columnas.join(','), // Encabezados
+        ...datos.map(fila => [
+            fila.numeroControl || '',
+            fila.nombre || '',
+            fila.materia || '',
+            fila.asistencia || '',
+            fila.fecha || ''
+        ].join(','))
+    ].join('\n');
+
+    const blob = new Blob([contenido], { type: 'text/csv' });
+    const enlace = document.createElement('a');
+    enlace.href = URL.createObjectURL(blob);
+    enlace.download = 'lista_asistencia.csv';
+    enlace.click();
+}
+
+// Controlador principal
+document.getElementById('sumarizar-lista').addEventListener('click', async () => {
+    const fechaInicio = document.getElementById('fecha-inicial').value;
+    const fechaFin = document.getElementById('fecha-final').value;
+    const materia = document.getElementById('sumarizar-materia').value;
+    const folderId = '1xPJ8ZCeR8hvWu38BRW8Mpr5jcOs6Cceu'; // Cambia este ID por tu carpeta de Google Drive
+    const estadoOperacion = document.getElementById('estado-operacion');
+
+    if (!fechaInicio || !fechaFin || !materia) {
+        alert("Por favor, completa todos los campos.");
+        return;
+    }
+
+    // Mostrar el mensaje de estado "Buscando..."
+    estadoOperacion.textContent = "Buscando, por favor espera...";
+    estadoOperacion.style.color = "blue";
+
+    try {
+        const token = await renovarAccessToken();
+        const fechas = generarFechas(fechaInicio, fechaFin);
+        const datosCompletos = [];
+
+        for (const fecha of fechas) {
+            const nombreArchivo = `${materia} - ${formatearFechaNombre(fecha)}`;
+            const archivos = await buscarArchivos(token, nombreArchivo, folderId);
+
+            for (const archivo of archivos) {
+                const contenido = await descargarArchivo(token, archivo.id);
+                const datos = parsearContenido(contenido, archivo.name);
+                datosCompletos.push(...datos);
+            }
+        }
+
+        if (datosCompletos.length > 0) {
+            renderizarTabla(datosCompletos);
+        } else {
+            alert("No se encontraron datos para los filtros seleccionados.");
+        }
+
+        // Cambiar el mensaje al finalizar
+        estadoOperacion.textContent = "Sumarizado finalizado.";
+        estadoOperacion.style.color = "green";
+    } catch (error) {
+        console.error("Error durante la operación:", error);
+        estadoOperacion.textContent = "Error durante la operación. Por favor, revisa la consola para más detalles.";
+        estadoOperacion.style.color = "red";
+    }
+});
+
+
+async function manejarArchivos(token, archivos) {
+    for (const archivo of archivos) {
+        console.log('Procesando archivo:', archivo.name);
+        try {
+            const contenido = await descargarArchivo(token, archivo.id, 'text/plain');
+            console.log('Contenido descargado:', contenido);
+            const datos = parsearContenido(contenido, archivo.name);
+            datosCompletos.push(...datos);
+        } catch (error) {
+            console.error('Error manejando archivo:', archivo.name, error);
+        }
+    }
+}
+
