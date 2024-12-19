@@ -1006,17 +1006,38 @@ function renderizarTabla(datos) {
 }
 
 function imprimirTabla() {
-    const tablaContainer = document.getElementById('tabla-container');
-    const contenidoOriginal = document.body.innerHTML;
+    const tablaContainer = document.getElementById('tabla-container').innerHTML; // Obtener solo la tabla
 
-    // Mostrar únicamente el contenido del recuadro rojo
-    document.body.innerHTML = tablaContainer.innerHTML;
-
-    // Abrir el cuadro de impresión
-    window.print();
-
-    // Restaurar el contenido original después de la impresión
-    document.body.innerHTML = contenidoOriginal;
+    // Crear una ventana temporal para la impresión
+    const ventanaImpresion = window.open('', '_blank');
+    ventanaImpresion.document.write(`
+        <html>
+        <head>
+            <title>Imprimir Lista de Asistencia</title>
+            <style>
+                table {
+                    width: 100%;
+                    border-collapse: collapse;
+                }
+                th, td {
+                    border: 1px solid black;
+                    padding: 8px;
+                    text-align: left;
+                }
+                th {
+                    background-color: #f2f2f2;
+                }
+            </style>
+        </head>
+        <body>
+            <table>${tablaContainer}</table>
+        </body>
+        </html>
+    `);
+    ventanaImpresion.document.close(); // Finalizar escritura en el documento
+    ventanaImpresion.focus(); // Asegurarse de que la ventana tenga el foco
+    ventanaImpresion.print(); // Llamar a la impresión
+    ventanaImpresion.close(); // Cerrar la ventana después de imprimir
 }
 
 
